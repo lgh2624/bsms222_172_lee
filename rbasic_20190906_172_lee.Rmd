@@ -1,0 +1,40 @@
+---
+title: "R Basics"
+output: html_document
+---
+
+# 3 R Basics
+
+## 3.2 The very basics
+
+### 3.2.1 Objects
+
+We can store some stuffs in R. We call it 'object' and we can use them similiar to how we do in math.
+For example, we can simplify equations as a form like ax^2+bx+c=0. If we are given a equation x^2+x-1=0, then we define with the sign "<-" like:
+
+```{r}
+a <- 1
+b <- 1
+c <- -1
+```
+
+And we can check the value stored in 'a' by typing:
+
+```{r}
+a
+```
+
+Or, we can print it by typing:
+
+```{r}
+print(a)
+```
+
+### 3.2.2. The workspace
+
+We can change our 'workspace' by defining objects and see all the variables saved in by typing:
+
+```{r}
+ls()
+```
+
