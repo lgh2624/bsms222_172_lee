@@ -11,6 +11,7 @@ In R, the most basic objects available to store data are vectors. As we have see
 ### 3.7.1 Creating vectors
 
 We can create vectors with using function 'c', which stands for concatenate(to join or link together, as though in a chain).
+
 ```{r}
 codes <- c(380, 124, 818)
 codes
