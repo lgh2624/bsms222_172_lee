@@ -6,7 +6,6 @@ output: html_notebook
 # 3.R Basics
 
 ## 3.7 Vectors
-
 In R, the most basic objects available to store data are vectors. As we have seen, complex datasets can usually be broken down into components that are vectors.
 
 ### 3.7.1 Creating vectors
