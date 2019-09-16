@@ -1759,11 +1759,9 @@ summary {
 <p>We can create vectors with using function ‘c’, which stands for concatenate(to join or link together, as though in a chain).</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXMgPC0gYygzODAsIDEyNCwgODE4KVxuY29kZXNcbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29kZXMgPC0gYygzODAsIDEyNCwgODE4KVxuY29kZXNcbmBgYCJ9 -->
 <pre class="r"><code>codes &lt;- c(380, 124, 818)
 codes</code></pre>
-<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4MCAxMjQgODE4XG4ifQ== -->
 <pre><code>[1] 380 124 818</code></pre>
@@ -1773,30 +1771,24 @@ codes</code></pre>
 <p>Also, vectors can contain characters with double quotes:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY291bnRyeSA8LSBjKFxcaXRhbHlcXCwgXFxjYW5hZGFcXCwgXFxlZ3lwdFxcKVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>country &lt;- c(\italy\, \canada\, \egypt\)</code></pre>
-<pre><code></code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY291bnRyeSA8LSBjKFwiaXRhbHlcIiwgXCJjYW5hZGFcIiwgXCJlZ3lwdFwiKVxuYGBgIn0= -->
+<pre class="r"><code>country &lt;- c(&quot;italy&quot;, &quot;canada&quot;, &quot;egypt&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>And single quotes:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY291bnRyeSA8LSBjKCdpdGFseScsICdjYW5hZGEnLCAnZWd5cHQnKVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY291bnRyeSA8LSBjKCdpdGFseScsICdjYW5hZGEnLCAnZWd5cHQnKVxuYGBgIn0= -->
 <pre class="r"><code>country &lt;- c('italy', 'canada', 'egypt')</code></pre>
-<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>If we do not use any quotes, the function would not work well. since that words would be recognized as undefined variables.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY291bnRyeSA8LSBjKGl0YWx5LCBjYW5hZGEsIGVneXB0KVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY291bnRyeSA8LSBjKGl0YWx5LCBjYW5hZGEsIGVneXB0KVxuYGBgIn0= -->
 <pre class="r"><code>country &lt;- c(italy, canada, egypt)</code></pre>
-<pre><code></code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IG9iamVjdCAnaXRhbHknIG5vdCBmb3VuZFxuIn0= -->
 <pre><code>Error: object 'italy' not found</code></pre>
@@ -1809,75 +1801,27 @@ codes</code></pre>
 <p>When we use vector, we can name the entries to connect two types of values.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXMgPC0gYyhpdGFseSA9IDM4MCwgY2FuYWRhID0gMTI0LCBlZ3lwdCA9IDgxOClcbmNvZGVzXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes &lt;- c(italy = 380, canada = 124, egypt = 818)
-codes</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIGl0YWx5IGNhbmFkYSAgZWd5cHQgXG4gICAzODAgICAgMTI0ICAgIDgxOCBcbiJ9 -->
-<pre><code> italy canada  egypt 
-   380    124    818 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>The type of this vector is:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY2xhc3MoY29kZXMpXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>class(codes)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcbnVtZXJpY1xcXG4ifQ== -->
-<pre><code>[1] \numeric\</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>numeric. But the names:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxubmFtZXMoY29kZXMpXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>names(codes)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcaXRhbHlcXCAgXFxjYW5hZGFcXCBcXGVneXB0XFwgXG4ifQ== -->
-<pre><code>[1] \italy\  \canada\ \egypt\ </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>can be characters.</p>
 <p>Also, we can use quotations:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXMgPC0gYyhcXGl0YWx5XFwgPSAzODAsIFxcY2FuYWRhXFwgPSAxMjQsIFxcZWd5cHRcXCA9IDgxOClcbmNvZGVzXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes &lt;- c(\italy\ = 380, \canada\ = 124, \egypt\ = 818)
-codes</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIGl0YWx5IGNhbmFkYSAgZWd5cHQgXG4gICAzODAgICAgMTI0ICAgIDgxOCBcbiJ9 -->
-<pre><code> italy canada  egypt 
-   380    124    818 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>And we can name vector contents with another vector by using function ‘name’:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXMgPC0gYygzODAsIDEyNCwgODE4KVxuY291bnRyeSA8LSBjKFxcaXRhbHlcXCxcXGNhbmFkYVxcLFxcZWd5cHRcXClcbm5hbWVzKGNvZGVzKSA8LSBjb3VudHJ5XG5jb2Rlc1xuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes &lt;- c(380, 124, 818)
-country &lt;- c(\italy\,\canada\,\egypt\)
-names(codes) &lt;- country
-codes</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIGl0YWx5IGNhbmFkYSAgZWd5cHQgXG4gICAzODAgICAgMTI0ICAgIDgxOCBcbiJ9 -->
-<pre><code> italy canada  egypt 
-   380    124    818 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1886,67 +1830,27 @@ codes</code></pre>
 <p>Another useful function for creating vectors generates sequences:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuc2VxKDEsIDEwKVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>seq(1, 10)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgMSAgMiAgMyAgNCAgNSAgNiAgNyAgOCAgOSAxMFxuIn0= -->
-<pre><code> [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Commonly, the number increases by 1, but we can change common difference:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuc2VxKDEsIDEwLCAyKVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>seq(1, 10, 2)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEgMyA1IDcgOVxuIn0= -->
-<pre><code>[1] 1 3 5 7 9</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>We can describe consequtive intgers just using ‘:’:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuMToxMFxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>1:10</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgMSAgMiAgMyAgNCAgNSAgNiAgNyAgOCAgOSAxMFxuIn0= -->
-<pre><code> [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>And the type of this description is:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY2xhc3MoMToxMClcbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<pre class="r"><code>class(1:10)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcaW50ZWdlclxcXG4ifQ== -->
-<pre><code>[1] \integer\</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>intger.</p>
 <p>But if we do not set the common difference as an intger like 0.5, the type of the sequence is:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY2xhc3Moc2VxKDEsIDEwLCAwLjUpKVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>class(seq(1, 10, 0.5))</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcbnVtZXJpY1xcXG4ifQ== -->
-<pre><code>[1] \numeric\</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>numeric.</p>
@@ -1956,66 +1860,21 @@ codes</code></pre>
 <p>We can access to elements of vectors by using square brackets ‘[]’:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXNbMl1cbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes[2]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiY2FuYWRhIFxuICAgMTI0IFxuIn0= -->
-<pre><code>canada 
-   124 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>When we want to access to multiple data, we can use index:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXNbYygxLDMpXVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes[c(1,3)]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiaXRhbHkgZWd5cHQgXG4gIDM4MCAgIDgxOCBcbiJ9 -->
-<pre><code>italy egypt 
-  380   818 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>and sequences:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXNbMToyXVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes[1:2]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIGl0YWx5IGNhbmFkYSBcbiAgIDM4MCAgICAxMjQgXG4ifQ== -->
-<pre><code> italy canada 
-   380    124 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>We can use names instead of numbers:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXNbXFxjYW5hZGFcXF1cbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes[\canada\]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiY2FuYWRhIFxuICAgMTI0IFxuIn0= -->
-<pre><code>canada 
-   124 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY29kZXNbYyhcXGVneXB0XFwsXFxpdGFseVxcKV1cbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<pre class="r"><code>codes[c(\egypt\,\italy\)]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiZWd5cHQgaXRhbHkgXG4gIDgxOCAgIDM4MCBcbiJ9 -->
-<pre><code>egypt italy 
-  818   380 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -2037,51 +1896,17 @@ codes</code></pre>
 <p>We can find that:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxueFxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>x</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEgMiAzXG4ifQ== -->
-<pre><code>[1] 1 2 3</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuY2xhc3MoeClcbmBgYFxuYGBgXG5gYGAifQ== -->
-<p><code>r</code>r</p>
-<pre class="r"><code>class(x)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcbnVtZXJpY1xcXG4ifQ== -->
-<pre><code>[1] \numeric\</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>the numerics(or intgers) are converted into charcters automatically.</p>
 <p>And we can do coercion manually by using function ‘as’:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxueCA8LSAxOjVcbnkgPC0gYXMuY2hhcmFjdGVyKHgpXG55XG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>x &lt;- 1:5
-y &lt;- as.character(x)
-y</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFxcMVxcIFxcMlxcIFxcM1xcIFxcNFxcIFxcNVxcXG4ifQ== -->
-<pre><code>[1] \1\ \2\ \3\ \4\ \5\</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Also, we can do it opposite:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuYXMubnVtZXJpYyh5KVxuYGBgXG5gYGBcbmBgYCJ9 -->
-<p><code>r</code>r</p>
-<pre class="r"><code>as.numeric(y)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDEgMiAzIDQgNVxuIn0= -->
-<pre><code>[1] 1 2 3 4 5</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>This function is actually quite useful since datasets that include numbers as character strings are common.</p>
@@ -2090,16 +1915,6 @@ y</code></pre>
 <p>If we coerced a value to be converted into some type which would not express that value, than the value would be replaced with special value called an ‘NA’ for “not available”.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxueCA8LSBjKFxcMVxcLCBcXGJcXCwgXFwzXFwpXG5hcy5udW1lcmljKHgpXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>x &lt;- c(\1\, \b\, \3\)
-as.numeric(x)</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiTkFzIGludHJvZHVjZWQgYnkgY29lcmNpb25cblsxXSAgMSBOQSAgM1xuIn0= -->
-<pre><code>NAs introduced by coercion
-[1]  1 NA  3</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>In this case, second value will be an ‘NA’. Because R cannot express the charcter “b” by numeric.</p>
@@ -2148,15 +1963,6 @@ as.numeric(x)</code></pre>
 </ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxudGVtcFsxOjNdXG5gYGBcbmBgYFxuYGBgIn0= -->
-<p><code>r</code>r</p>
-<pre class="r"><code>temp[1:3]</code></pre>
-<pre><code></code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQmVpamluZyAgIExhZ29zICAgUGFyaXMgXG4gICAgIDM1ICAgICAgODggICAgICA0MiBcbiJ9 -->
-<pre><code>Beijing   Lagos   Paris 
-     35      88      42 </code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <ol start="5" style="list-style-type: decimal">
