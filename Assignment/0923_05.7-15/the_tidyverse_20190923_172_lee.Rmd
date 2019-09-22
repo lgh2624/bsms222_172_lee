@@ -1,0 +1,537 @@
+---
+title: "0923 Assignment"
+output: html_notebook
+---
+
+# 5. The tidyverse
+
+## 5.7 Summarizing data
+
+In data analysis, we can summarize some datasets or split them into several groups.
+
+### 5.7.1 `summarize`
+
+The function `summarize` in dplyr provides summary statistics tools.
+For example, we will use data `heights`.:
+```{r}
+library(dplyr)
+library(dslabs)
+data(heights)
+```
+
+We can calculate the average and standard deviation of female heights:
+```{r}
+s <- heights %>% 
+  filter(sex == "Female") %>%
+  summarize(average = mean(height), standard_deviation = sd(height))
+s
+```
+
+And the type of `s` is the data frame, so we can use `$`:
+```{r}
+s$average
+s$standard_deviation
+```
+
+Once we use `summarize`, we can reuse variables several times. There is other statistics like minimum, median, maximum:
+```{r}
+heights %>% 
+  filter(sex == "Female") %>%
+  summarize(median = median(height), minimum = min(height), maximum = max(height))
+```
+
+We can use the function `quantile` to get min, med, max value like`quantile(x, c(0, 0.5, 1))`. But it returns more than 2 values:
+```{r}
+heights %>% 
+  filter(sex == "Female") %>%
+  summarize(range = quantile(height, c(0, 0.5, 1)))
+```
+and crashes. We will handle this at 5.12
+
+And we can apply this for data of `murders`:
+```{r}
+data(murders)
+murders <- murders %>% mutate(rate = total/population*100000)
+```
+
+We can calculate the mean rate of murder:
+```{r}
+summarize(murders, mean(rate))
+```
+But this is incorrect because the weigh of each states are not exactly same. So:
+```{r}
+us_murder_rate <- murders %>%
+  summarize(rate = sum(total) / sum(population) * 100000)
+us_murder_rate
+```
+
+### 5.7.2. `pull`
+
+The `us_murder_rate` has only one value, but it is a data frame:
+```{r}
+class(us_murder_rate)
+```
+
+The function `summarize` always return a data frame. If we want to get only a numeric data, we can use the function `pull`:
+```{r}
+us_murder_rate %>% pull(rate)
+```
+
+And we can write whole codes as one line code.
+```{r}
+us_murder_rate <- murders %>% 
+  summarize(rate = sum(total) / sum(population) * 100000) %>%
+  pull(rate)
+```
+
+Now, the type of `us_murder_rate` is:
+```{r}
+class(us_murder_rate)
+```
+numeric.
+
+### 5.7.3. Group then summarize with `group_by`
+
+We can split datasets into small groups with function `group_by` and summarize them respectively.
+
+For example, we can separate `height` into two groups by sex:
+```{r}
+heights %>% group_by(sex)
+```
+
+And when we put this data into `summrize`:
+```{r}
+heights %>% 
+  group_by(sex) %>%
+  summarize(average = mean(height), standard_deviation = sd(height))
+```
+the average and standard deviation would be calculated respectively.
+
+If we want get median valuse of `murders` of each region, we would type:
+```{r}
+murders %>% 
+  group_by(region) %>%
+  summarize(median_rate = median(rate))
+```
+
+## 5.8 Sorting data frames
+
+We can use `arrange` from *dplyr* instead of use the function `order` or `sort`.
+For example, we can sort `murders` in order of populations:
+```{r}
+murders %>%
+  arrange(population) %>%
+  head()
+```
+
+or of murder rate:
+```{r}
+murders %>% 
+  arrange(rate) %>% 
+  head()
+```
+
+In general, the function order values in ascending order. If we want to sort in descending order, we can use function `desc`:
+```{r}
+murders %>% 
+  arrange(desc(rate)) %>% 
+  head()
+```
+
+### 5.8.1 Nested sorting
+
+We can select second(or than more) column to order to break the tie.
+```{r}
+murders %>% 
+  arrange(region, rate) %>% 
+  head()
+```
+
+### 5.8.2 The top n
+If we use the function `top_n` to see smallest(or largest) rows as many as we want:
+```{r}
+murders %>% top_n(10, rate)
+```
+`top_n` does not sort the data frame only filers.
+
+## 5.9 Exercises
+
+For these exercises we will use the data from United States National Center for Health Statistics (NCHS)
+```{r}
+# install.packages("NHANES")
+library(NHANES)
+data(NHANES)
+```
+
+The NHANES data has many missing values. Remember that the main summarization function in R will return NA if any of the entries of the input vector is an NA. Here is an example:
+```{r}
+library(dslabs)
+data(na_example)
+mean(na_example)
+sd(na_example)
+```
+
+To ignore the NAs we can use the na.rm argument:
+```{r}
+mean(na_example, na.rm = TRUE)
+sd(na_example, na.rm = TRUE)
+```
+
+Let’s now explore the NHANES data.
+
+1. We will provide some basic facts about blood pressure. First let’s select a group to set the standard. We will use 20-29 year old females. `AgeDecade` is a categorical variable with these ages. Note that the category is coded like " 20-29“, with a space in front! What is the average and standard deviation of systolic blood pressure as saved in the `BPSysAve` variable? Save it to a variable called `ref`.
+Hint: Use `filter` and `summarize` and use the `na.rm = TRUE` argument when computing the average and standard deviation. You can also filter the NA values using `filter`.
+```{r}
+ref <- NHANES %>%
+  filter(AgeDecade == " 20-29") %>%
+  summarize(standard_deviation = sd(BPSysAve, na.rm = TRUE))
+ref
+```
+
+2. Using a pipe, assign the average to a numeric variable `ref_avg`. Hint: Use the code similar to above and then `pull`.
+```{r}
+ref_avg <- NHANES %>%
+  filter(AgeDecade == " 20-29") %>%
+  summarize(average = mean(BPSysAve, na.rm = TRUE)) %>% pull()
+ref_avg
+```
+
+3. Now report the min and max values for the same group.
+```{r}
+NHANES %>%
+  filter(AgeDecade == " 20-29") %>%
+  summarize(maximum = max(BPSysAve, na.rm = TRUE), minimum = min(BPSysAve, na.rm = TRUE))
+```
+
+4. Compute the average and standard deviation for females, but for each age group separately rather than a selected decade as in question 1. Note that the age groups are defined by `AgeDecade`. Hint: rather than filtering by age and gender, filter by `Gender` and then use `group_by`.
+```{r}
+NHANES %>%
+  filter(Gender == "female" & !(is.na(AgeDecade))) %>%
+  group_by(AgeDecade) %>%
+  summarize(standard_deviation = sd(BPSysAve, na.rm = TRUE))
+```
+
+5. Repeat exercise 4 for males.
+```{r}
+NHANES %>%
+  filter(Gender == "male" & !(is.na(AgeDecade))) %>%
+  group_by(AgeDecade) %>%
+  summarize(standard_deviation = sd(BPSysAve, na.rm = TRUE))
+```
+
+6. We can actually combine both summaries for exercises 4 and 5 into one line of code. This is because `group_by` permits us to group by more than one variable. Obtain one big summary table using `group_by(AgeDecade, Gender)`.
+```{r}
+NHANES %>%
+  filter(!(is.na(AgeDecade))) %>%
+  group_by(AgeDecade, Gender) %>%
+  summarize(standard_deviation = sd(BPSysAve, na.rm = TRUE))
+```
+
+7. For males between the ages of 40-49, compare systolic blood pressure across race as reported in the `Race1` variable. Order the resulting table from lowest to highest average systolic blood pressure.
+```{r}
+NHANES %>% filter(AgeDecade == " 40-49" & !(is.na(Race1))) %>%
+  group_by(Race1) %>%
+  summarize(average = mean(BPSysAve, na.rm = TRUE)) %>%
+  arrange(average)
+```
+
+## 5.10 Tibbles
+
+We use data frame to tidy data:
+```{r}
+data(murders)
+class(murders)
+```
+
+Then if we use `group_by` to separate data into groups, where is the group information stored?
+```{r}
+murders %>% group_by(region) %>% head()
+```
+We can find that there is 'tibble' to store data frames.
+
+If we find the types of that data:
+```{r}
+murders %>% group_by(region) %>% class()
+```
+are "grouped_df", "tbl_df", "tbl", and "data.frame".
+It is different from data frame.
+The type "tbl" means the tibble and it has different characteristics with data frame. And we would prefer tibbles.
+
+### 5.10.1 Tibbles display better
+
+We can display better with using tibbles because tibble adjust to size of R consoles automatically. We can convert data frame as a tibble with function `as_tibble`.
+
+### 5.10.2. Subsets of tibbles are tibbles
+
+The subset of data frame is a vector or scalar:
+```{r}
+class(murders[,4])
+```
+
+But the subset of tibble is also a tibble:
+```{r}
+class(as_tibble(murders)[,4])
+```
+
+And we can access to a column with `$` without converting type back to data frame:
+```{r}
+class(as_tibble(murders)$population)
+```
+
+If we missed spellings of the name of columns, it returns in the case of the data frame:
+```{r}
+murders$Population
+```
+just a NULL.
+But in the case of the tibble:
+```{r}
+as_tibble(murders)$Population
+```
+it returns Warning as well as NULL.
+
+### 5.10.3 Tibbles can have complex entries
+
+Data frames should store vectors of numbers, strings or logical values. But tibbles can store more complex objects such as list or functions:
+```{r}
+tibble(id = c(1, 2, 3), func = c(mean, median, sd))
+```
+
+### 5.10.4 Tibbles can be grouped
+
+If we group tibbles with `group_by`, it returns a grouped tibble. It stores information of the group of the row. It is useful for `summarize`.
+
+### 5.10.5 Create a tibble using `data_frame` instead of `data.frame`
+
+We can create tibbles with function `data_frame` instead of `data.frame`
+```{r}
+grades <- data_frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90))
+grades
+```
+
+The vanila R has the function `data.frame`. It literally creates a data frame and coerces characters into factors:
+```{r}
+grades <- data.frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90))
+class(grades$names)
+```
+
+So, we should use `stringAsFacstros`:
+```{r}
+grades <- data.frame(names = c("John", "Juan", "Jean", "Yao"), 
+                     exam_1 = c(95, 80, 90, 85), 
+                     exam_2 = c(90, 85, 85, 90),
+                     stringsAsFactors = FALSE)
+class(grades$names)
+```
+
+We can convert data frame into a tibble with using `as_tibble`:
+```{r}
+as_tibble(grades) %>% class()
+```
+
+## 5.11 The dot operator
+
+If we want to find the median value of murder rate of South region, we can write code like this:
+```{r}
+tab_1 <- filter(murders, region == "South")
+tab_2 <- mutate(tab_1, rate = total / population * 10^5)
+rates <- tab_2$rate
+median(rates)
+```
+
+But it needs to declare more variables. Therefore we can use pipes `%>%`:
+```{r}
+filter(murders, region == "South") %>% 
+  mutate(rate = total / population * 10^5) %>% 
+  summarize(median = median(rate)) %>%
+  pull(median)
+```
+
+Then there is a question: Can we access the data frame except last step as `tab_2$rate` from the first code?
+In this case, we can use the dot operator:
+```{r}
+rates <-filter(murders, region == "South") %>% 
+  mutate(rate = total / population * 10^5) %>% 
+  .$rate
+median(rates)
+```
+
+## 5.12 `do`
+
+In general, most of functions are get and return data by the type of data frame. So, they may not understand grouped tibbles. In this case, we use the function `do` to recognize grouped tibbles and return data frame.
+
+In section 5.7.1, we tried to use `quantiles` but we just called some errors:
+```{r}
+data(heights)
+heights %>% 
+  filter(sex == "Female") %>%
+  summarize(range = quantile(height, c(0, 0.5, 1)))
+```
+
+We are now tring to fix this. At first, we define a function, as we want, that receive a data frame and return a data frame also:
+```{r}
+my_summary <- function(dat){
+  x <- quantile(dat$height, c(0, 0.5, 1))
+  data_frame(min = x[1], median = x[2], max = x[3])
+}
+```
+
+And we can apply this to `heights`:
+```{r}
+heights %>% 
+  group_by(sex) %>% 
+  my_summary
+```
+
+But it returns only one summary. So we would use `do`:
+```{r}
+heights %>% 
+  group_by(sex) %>% 
+  do(my_summary(.))
+```
+Finally, this is that exactly we want.
+
+If we forget to use dot operator `.`, we might face with some errors:
+```{r}
+heights %>% 
+  group_by(sex) %>% 
+  do(my_summary())
+```
+Since, without using dot operator, `my_summary` may receive anything.
+
+Or, missing round brackets also get same situation:
+```{r}
+heights %>% 
+  group_by(sex) %>% 
+  do(my_summary)
+```
+For this, `do` might receive a function. It may not make sense.
+
+## 5.13 The purrr package
+
+Before, we have made function to sum from 1 upto intger n, `compute_s_n`:
+```{r}
+compute_s_n <- function(n){
+  x <- 1:n
+  sum(x)
+}
+```
+
+And we used `sapply` to calculate multiple 'n's:
+```{r}
+n <- 1:25
+s_n <- sapply(n, compute_s_n)
+```
+
+But `sapply` has some side effects like setting type of numeric values to charcter and so on. So it might be better to use *purrr* library. To use the function `map`, the result will be similar to that of using `sapple`. But `map` returns a list:
+```{r}
+library(purrr)
+s_n <- map(n, compute_s_n)
+class(s_n)
+```
+
+And the function `map_db1` returns a vector of numeric values:
+```{r}
+s_n <- map_dbl(n, compute_s_n)
+class(s_n)
+```
+
+The function `map_df` returns a tibble data frame. But it should get a function that returns a vector or list with names:
+```{r}
+s_n <- map_df(n, compute_s_n)
+```
+Therefore, current function would not work well.
+
+So, we should change function:
+```{r}
+compute_s_n <- function(n){
+  x <- 1:n
+  data_frame(sum = sum(x))
+}
+s_n <- map_df(n, compute_s_n)
+head(s_n)
+```
+
+## 5.14 Tidyverse conditionals
+
+*dplyr* also has own conditional operations.
+
+### 5.14.1 `case_when`
+
+The function `case_when` can separate values in a vector by condition. It is more general than `ifelse` that separate into 2 groups, TRUE or FALSE.
+```{r}
+x <- c(-2, -1, 0, 1, 2)
+case_when(x < 0 ~ "Negative", x > 0 ~ "Positive", TRUE ~ "Zero")
+```
+
+For example, we should group states by some criteria and get murder rate of each group:
+```{r}
+data(murders)
+murders %>% 
+  mutate(group = case_when(
+    abb %in% c("ME", "NH", "VT", "MA", "RI", "CT") ~ "New England",
+    abb %in% c("WA", "OR", "CA") ~ "West Coast",
+    region == "South" ~ "South",
+    TRUE ~ "other")) %>%
+  group_by(group) %>%
+  summarize(rate = sum(total) / sum(population) * 10^5) %>%
+  arrange(rate)
+```
+
+### 5.14.2 `between`
+
+If we want to find wheter the value is included between a and b, we have typed:
+```{r}
+x >= a & x <= b
+```
+
+But we can use the function `between` and simplify that code to this:
+```{r}
+between(x, a, b)
+```
+
+## 5.15 Exercises
+
+1. Load the `murders` dataset. Which of the following is true? B
+
+A. `murders` is in tidy format and is stored in a tibble.
+-> `murders` is stored in a data frame.
+
+B. `murders` is in tidy format and is stored in a data frame.
+-> Yes, we can extend more information of states with adding more vectors.
+
+C. `murders` is not in tidy format and is stored in a tibble.
+-> `murders` is stored in a data frame.
+
+D. `murders` is not in tidy format and is stored in a data frame.
+-> This data frame does not seem not tidy.
+
+2. Use `as_tibble` to covert the `murders` data table into a tibble and save it in an object called `murders_tibble`.
+```{r}
+murders_tibble <- as_tibble(murders)
+```
+
+3. Use the `group_by` function to convert `murders` into a tibble that is grouped by region.
+```{r}
+group_by(murders)
+```
+
+4. Write tidyverse code that is equivalent to this code: `exp(mean(log(murders$population)))`. Write it using the pipe so that each function is called without arguments. Use the dot operator to access the population. Hint: The code should start with `murders %>%`.
+```{r}
+exp(mean(log(murders$population)))
+murders %>% .$population %>% log() %>% mean() %>% exp()
+```
+
+5. Use the `map_df` to create a data frame with three columns named `n`, `s_n`, and `s_n_2`. The first column should contain the numbers 1 through 100. The second and third columns should each contain the sum of 1 through n with n the row number.
+```{r}
+func <- function(n){
+  x <- 1:n
+  data_frame(s_n = sum(x))
+}
+df <- data.frame(n = seq(1,100)) %>%
+  cbind(s_n = map_df(n, func)) %>%
+  mutate(s_n_2 = s_n)
+```
