@@ -10,7 +10,7 @@ output: html_document
 ### 3.2.1 Objects
 
 We can store some stuff in R. We call it 'object' and we can use them similiar to how we do in math.
-For example, we can simplify equations as a form like ax^2+bx+c=0. If we are given a equation x^2+x-1=0, then we define with the sign "<-" like:
+For example, we can simplify equations as a form like ax^2^+bx+c=0. If we are given a equation x^2^+x-1=0, then we define with the sign `<-` like:
 
 ```{r}
 a <- 1
@@ -142,7 +142,7 @@ You can use function "save", "save.image", and "load", but RStudio has beautiful
 
 ### 3.2.7. Motivating scripts
 
-To solve another equation 3x^2+2x-1=0, we can use code above:
+To solve another equation 3x^2^+2x-1=0, we can use code above:
 ```{r}
 a <- 3
 b <- 2
