@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse, quietly = T)
+library(readr, quietly = T)
+```
+GENCODE를 이용하여,
+1. 유전자(gene)들만 선택을 합니다. 여기에서 gene_id, gene_name, hgnc_id, gene_type, chromosome, start, end, strand를 갖는 data frame을 만들고, txt 파일로 저장합니다. 이때 hgnc 정보가 부재한 유전자들은 0으로 표시합니다. 각 정보에 대한 자세한 내용은 여기에 https://www.gencodegenes.org/pages/data_format.html
+```{r}
+# cols = c('chrom', 'source', 'feature_type', 'start', 'end', 'score', 'strand', 'phase', 'info')
+# d = read_delim('gencode.v31.basic.annotation.gtf.gz', delim='\t',
+#               skip = 5, progress = F, col_names = cols)
+
+#d1 <- filter(d, feature_type == "gene")
+#d1 = read_delim('table.gene_genecode.20190918.txt', 
+#               delim='\t', skip = 5, progress = F, col_names = cols)
+
+d1$gene_id <- as.character(do.call(rbind.data.frame, strsplit(d1$info, 'gene_id\\s+"'))[[2]])
+d1$gene_id <- as.character(do.call(rbind.data.frame, strsplit(d1$gene_id, '"'))[[1]])
+```
+```{r}
+d1$gene_name <- as.character(do.call(rbind.data.frame, strsplit(d1$info, 'gene_name\\s+"'))[[2]])
+d1$gene_name <- as.character(do.call(rbind.data.frame, strsplit(d1$gene_name, '"'))[[1]])
+```
+```{r}
+d1$hgnc_id <- as.character(do.call(rbind.data.frame, strsplit(d1$info, 'hgnc_id\\s+"'))[[2]])
+d1$hgnc_id <- as.character(do.call(rbind.data.frame, strsplit(d1$hgnc_id, '"'))[[1]])
+
+ind = which(!(grepl('hgnc', d1$info)))
+d1$hgnc_id[ind] <- 0
+# d1$hgnc_id <- as.character(do.call(rbind.data.frame, list(ifelse(grepl('hgnc', d1$hgnc_id), d1$hgnc_id, 0))))
+
+table(d1$hgnc_id)
+```
+```{r}
+d1$gene_type <- as.character(do.call(rbind.data.frame, strsplit(d1$info, 'gene_type\\s+"'))[[2]])
+d1$gene_type <- as.character(do.call(rbind.data.frame, strsplit(d1$gene_type, '"'))[[1]])
+
+write.table(d1, 'table.gene_genecode.20190923.txt', sep='\t', quote=F, row.names = F, col.names = T)
+```
+
+2. gene biotype에 따라 hgnc 정보 존재 여부를 계수합니다.
+```{r}
+group_by(d1, gene_type) %>% summarize(pop_entire = sum(hgnc_id != '"'),
+                                      pop_hgnc = sum(hgnc_id != 0),
+                                      freq = pop_hgnc / pop_entire)
+```
+
+3. hgnc 여부에 따라 level을 나눕니다. level은 transcript_support_level이 아니라, 그냥 level입니다.
+```{r}
+d1$level <- as.character(do.call(rbind.data.frame, strsplit(d1$info, 'level '))[[2]])
+d1$level <- as.character(do.call(rbind.data.frame, strsplit(d1$level, ';'))[[1]])
+
+table(d1$level)
+sum(is.na(d1$level))
+
+library(ggplot2)
+omg <- group_by(d1, hgnc_id == 0, level) %>% count() #%>% barplot()
+omg
+```
+
