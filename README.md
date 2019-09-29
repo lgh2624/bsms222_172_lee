@@ -35,10 +35,10 @@
 ## Tutorials
 
 ### Explore SCN2A mutations collected from Sanders et al 2018
-[analyze_scn2a_mutations.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/Lecture%20Material/01_analyze_scn2a_mutations/analyze_scn2a_mutations_02.nb.html)
+[analyze_scn2a_mutations.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/lecture_material/01_analyze_scn2a_mutations/analyze_scn2a_mutations_02.nb.html)
 
 ### Gene annotations for the human genome
-[analyze_gencode.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/Lecture%20Material/02_analyze_gencode/analyze_gencode_01.nb.html)
+[analyze_gencode.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/lecture_material/02_analyze_gencode/analyze_gencode_01.nb.html)
 
 ### TCGA Lung Cancer
 [analyze_tcga.Rmd]
