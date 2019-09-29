@@ -21,7 +21,7 @@
 [ggplot2_20190925_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/Assignment/0925_08/ggplot2_20190925_172_lee.nb.html)
 
 ### 0930_09
-[visualizing_data_distributions_20190930_172_lee.Rmd]
+[visualizing_data_distributions_20190930_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/Assignment/0930_09/visualizing_data_distributions_20190930_172_lee.nb.html)
 
 ### 1002_10
 [data_visualization_in_practice_20191002_172_lee.Rmd]
