@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 # 8. ggplot2
-##
+
 We can visualize data easily and flexibly with using R.
 For this semester, we will use ggplot package.
 ```{r}
