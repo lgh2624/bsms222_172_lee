@@ -525,7 +525,7 @@ For example, here is a data frame about `x` and `y`:
 x <- expand.grid(x = 1:12, y = 1:10) %>% 
   mutate(z = 1:120) 
 ```
-It is a tiyd version of `matrix(1:120, 12, 10)`
+It is a tidy version of `matrix(1:120, 12, 10)`
 
 To plot the image we use the following code:
 ```{r}
