@@ -24,7 +24,7 @@
 [visualizing_data_distributions_20190930_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/0930_09/visualizing_data_distributions_20190930_172_lee.nb.html)
 
 ### 1002_10
-[data_visualization_in_practice_20191002_172_lee.Rmd]
+[data_visualization_in_practice_20191002_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1002_10/data_visualization_in_practice_20191002_172_lee.nb.html)
 
 ### 1007_11
 [data_visualization_principles_20191007_172_lee.Rmd]
