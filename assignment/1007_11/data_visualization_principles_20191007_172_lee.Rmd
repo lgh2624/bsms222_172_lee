@@ -1,0 +1,500 @@
+---
+title: "Data visualization principles"
+output: html_notebook
+---
+
+# 11 Data visualization principles
+##
+Here, we aim to provide some general principles we can use as a guide for effective data visualization. We compare and contrast plots that follow these principles to those that don’t.
+The principles are mostly based on research related to how humans detect patterns and make visual comparisons. When deciding on a visualization approach, it is also important to keep our goal in mind. 
+
+We will use:
+```{r}
+library(tidyverse)
+library(dslabs)
+library(gridExtra)
+```
+
+## 11.1 Encoding data using visual cues
+
+We start by describing some principles for encoding data. There are several approaches at our disposal including position, aligned lengths, angles, area, brightness, and color hue.
+A widely used graphical representation of percentages is the pie chart.
+The donut chart is an example of a plot that uses only area.
+In this case, simply showing the numbers is clearer.
+The barplot uses this approach by using bars of length proportional to the quantities of interest.
+In general, when displaying quantities, position and length are preferred over angles and/or area.
+
+## 11.2 Know when to include 0
+
+When using barplots, it is misinformative not to start the bars at 0. By avoiding 0, relatively small differences can be made to look much bigger than they actually are.
+When using position rather than length, it is then not necessary to include 0. Note that in the plot on the left, which includes 0, the space between 0 and 43 adds no information and makes it harder to compare the between and within group variability.
+
+## 11.3 Do not distort quantities
+
+If you plot a data by circle with radius in proportion to that. It will distort your data.
+Not surprisingly, ggplot2 defaults to using area rather than radius.
+
+## 11.4 Order categories by a meaningful value
+
+When one of the axes is used to show categories, as is done in barplots, the default ggplot2 behavior is to order the categories alphabetically. Instead, we should order by a meaningful quantity. We previously learned how to use the `reorder` function, which helps us achieve this goal.
+```{r}
+data(murders)
+murders %>% mutate(murder_rate = total / population * 100000) %>%
+#  mutate(state = reorder(state, murder_rate)) %>%
+  ggplot(aes(state, murder_rate)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  theme(axis.text.y = element_text(size = 6)) +
+  xlab("")
+```
+
+```
+data("gapminder")
+gapminder %>% filter(year == 2016) %>%
+  group_by(region) %>%
+  mutate(dollars_per_day = gdp/365) %>%
+  ggplot(aes(region, dollars_per_day)) +
+  labs(aes(region)) +
+  geom_boxplot() +
+  geom_point()
+```
+
+## 11.5 Show the data
+
+We have focused on displaying single quantities across categories. We now shift our attention to displaying data, with a focus on comparing groups.
+This time let’s assume that we are interested in the difference in heights between males and females. This simple ggplot2 code already generates a more informative plot than the barplot by simply showing all the data points:
+```{r}
+data(heights)
+
+heights %>% 
+  ggplot(aes(sex, height)) + 
+  geom_point() 
+```
+
+This plot has limitations as well, since we can’t really see all the 238 and 812 points plotted for females and males respectively, and many points are plotted on top of each other.
+The first is to add jitter. This adds a small random shift to each point. And the second improvement comes from using alpha blending. That makes the dot transparent.
+```{r}
+heights %>% 
+  ggplot(aes(sex, height)) +
+  geom_jitter(width = 0.1, alpha = 0.2) 
+```
+## 11.6 Ease comparisons
+
+### 11.6.1 Use common axes
+
+Since there are so many points, it is more effective to show distributions rather than individual points.
+```{r}
+heights %>% group_by(sex) %>%
+  ggplot(aes(height, y= ..density..)) +
+  geom_histogram(binwidth = 1, color = 'black') +
+  facet_grid(.~sex)
+```
+
+We have to look carefully to notice that the x-axis has a higher range of values in the male histogram. Keep the axes the same when comparing data across to plots.
+```{r}
+heights %>% group_by(sex) %>%
+  ggplot(aes(height, y= ..density..)) +
+  geom_histogram(binwidth = 1, color = 'black') +
+  xlim(50, 84) +
+  facet_grid(.~sex)
+```
+
+### 11.6.2 Align plots vertically to see horizontal changes and horizontally to see vertical changes
+
+Aligning the plots vertically helps us see this change when the axes are fixed:
+```{r}
+heights %>% 
+  ggplot(aes(height, ..density..)) +
+  geom_histogram(binwidth = 1, color="black") +
+  facet_grid(sex~.)
+```
+If we want the more compact summary provided by boxplots, we then align them horizontally
+```{r}
+ heights %>% 
+  ggplot(aes(sex, height)) + 
+  geom_boxplot(coef=3) + 
+  geom_jitter(width = 0.1, alpha = 0.2) +
+  ylab("Height in inches")
+```
+
+### 11.6.3 Consider transformations
+
+The combination of an incorrectly chosen barplot and a failure to use a log transformation when one is merited can be particularly distorting.
+For example, the average of the population by each continent. If we use log scale, it is likely that we may distort the data. So, we must carefully deal with it.
+
+### 11.6.4 Visual cues to be compared should be adjacent
+
+If we compare multiple plots, the order of any labels must be identical.
+
+### 11.6.5 Use color
+
+The comparison becomes even easier to make if we use color to denote the two things we want to compare:
+
+## 11.7 11.7 Think of the color blind
+
+About 10% of the population is color blind. Unfortunately, the default colors used in ggplot2 are not optimal for this group. However, ggplot2 does make it easy to change the color palette used in the plots.
+```{r}
+color_blind_friendly_cols <- 
+  c("#999999", "#E69F00", "#56B4E9", "#009E73", 
+    "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+```
+
+## 11.8 Plots for two variables
+
+In general, you should use scatterplots to visualize the relationship between two variables. However, there are some exceptions and we describe two alternative plots here: the slope chart and the Bland-Altman plot.
+
+### 11.8.1 Slope charts
+
+One exception where another type of plot may be more informative is when you are comparing variables of the same type.
+There is no geometry for slope charts in ggplot2, but we can construct one using `geom_line`. 
+```{r}
+# select regions/countries we want
+west <- c("Western Europe","Northern Europe","Southern Europe",
+          "Northern America","Australia and New Zealand")
+
+# get data of life expectancy of selected countries of two year
+dat <- gapminder %>% 
+  filter(year%in% c(2010, 2015) & region %in% west & 
+           !is.na(life_expectancy) & population > 10^7) 
+
+
+dat %>%
+  # set location of each point
+  mutate(location = ifelse(year == 2010, 1, 2), 
+         location = ifelse(year == 2015 & 
+                             country %in% c("United Kingdom","Portugal"),
+                           location+0.22, location),
+         # 
+         hjust = ifelse(year == 2010, 1, 0)) %>%
+  mutate(year = as.factor(year)) %>%
+  ggplot(aes(year, life_expectancy, group = country)) +
+  # make lines connecting same country
+  geom_line(aes(color = country), show.legend = FALSE) +
+  # show texts
+  geom_text(aes(x = location, label = country, hjust = hjust), 
+            show.legend = FALSE) +
+  xlab("") + 
+  ylab("Life Expectancy")
+```
+If we use scatter plots, we should observe the rules. But we cannot see data at once.
+
+### 11.8.2 Bland-Altman plot
+
+The Bland-Altman plot, also known as the Tukey mean-difference plot and the MA-plot, shows the difference versus the average:
+```{r}
+library(ggrepel)
+
+dat %>% 
+  # make colunm of data we want
+  mutate(year = paste0("life_expectancy_", year)) %>%
+  select(country, year, life_expectancy) %>%
+  spread(year, life_expectancy) %>% 
+  # calculate avg. and dif.
+  mutate(average = (life_expectancy_2015 + life_expectancy_2010)/2,
+         difference = life_expectancy_2015 - life_expectancy_2010) %>%
+  
+  # plotting
+  ggplot(aes(average, difference, label = country)) + 
+  geom_point() +
+  
+  # name the point and axis
+  geom_text_repel() +
+  geom_abline(lty = 2) +
+  xlab("Average of 2010 and 2015") + 
+  ylab("Difference between 2015 and 2010")
+```
+
+## 11.9 Encoding a third variable
+
+We can use other variables like shape wiht argument `shape` or colors with package `RColorBrewer`
+```{r}
+library(RColorBrewer)
+display.brewer.all(type="seq")
+
+display.brewer.all(type="div")
+```
+
+## 11.10 Avoid pseudo-three-dimensional plots
+
+Humans are not good at seeing in three dimensions and our limitation is even worse with regard to pseudo-three-dimensions. This only adds confusion and makes it harder to relay your message.
+
+## 11.11 Avoid too many significant digits
+
+By default, statistical software like R returns many significant digits. That many digits often adds no information and the added the visual clutter can make it hard for the viewer to understand the message.
+
+## 11.12 Know your audience
+Graphs can be used for 1) our own exploratory data analysis, 2) to convey a message to experts, or 3) to help tell a story to a general audience. Make sure that the intended audience understands each element of the plot.
+
+## 11.13 Exercises
+
+For these exercises, we will be using the vaccines data in the dslabs package:
+```{r}
+library(tidyverse)
+library(dslabs)
+library(ggplot2)
+data(us_contagious_diseases)
+```
+
+1. Pie charts are appropriate: A
+
+A. When we want to display percentages.
+-> Yes.
+
+B. When ggplot2 is not available.
+-> The platform does not matter.
+
+C. When I am in a bakery.
+-> ...?
+
+D. Never. Barplots and tables are always better.
+-> Maybe? But always there is exceptions.
+
+2. What is the problem with the plot below: B
+https://rafalab.github.io/dsbook/book_files/figure-html/baplot-not-from-zero-exercises-1.png
+
+A. The values are wrong. The final vote was 306 to 232.
+-> We do not care about that.
+
+B. The axis does not start at 0. Judging by the length, it appears Trump received 3 times as many votes when, in fact, it was about 30% more.
+-> Exactly.
+
+C. The colors should be the same.
+-> I think it is more desirable to differentiate each candidate.
+
+D. Percentages should be shown as a pie chart.
+-> We do not need percenatage data.
+
+3. Take a look at the following two plots. They show the same information: 1928 rates of measles across the 50 states.
+
+Which plot is easier to read if you are interested in determining which are the best and worst states in terms of rates, and why? C
+
+A. They provide the same information, so they are both equally as good.
+-> Nope.
+
+B. The plot on the right is better because it orders the states alphabetically.
+-> Alphabetic order is left one.
+
+C. The plot on the right is better because alphabetical order has nothing to do with the disease and by ordering according to actual rate, we quickly see the states with most and least rates.
+-> Correct.
+
+D. Both plots should be a pie chart.
+-> No way...
+
+4. To make the plot on the left, we have to reorder the levels of the states’ variables.
+```{r}
+dat <- us_contagious_diseases %>%  
+  filter(year == 1967 & disease=="Measles" & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+```
+Note what happens when we make a barplot:
+```{r}
+dat %>% ggplot(aes(state, rate)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+Define these objects:
+```{r}
+state <- dat$state
+rate <- dat$count/dat$population*10000*52/dat$weeks_reporting
+```
+Redefine the `state` object so that the levels are re-ordered. Print the new object `state` and its levels so you can see that the vector is not re-ordered by the levels.
+```{r}
+state <- reorder(state, rate)
+state
+levels(state)
+```
+
+5. Now with one line of code, define the `dat` table as done above, but change the use mutate to create a rate variable and reorder the state variable so that the levels are reordered by this variable. Then make a barplot using the code above, but for this new `dat`.
+```{r}
+dat <- us_contagious_diseases %>% 
+  filter(year == 1967 & disease == "Measles" & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) %>%
+  mutate(state = reorder(state, rate))
+
+dat %>% ggplot(aes(state, rate)) +
+  geom_bar(stat="identity") +
+  coord_flip()
+```
+
+6. Say we are interested in comparing gun homicide rates across regions of the US. We see this plot:
+```{r}
+library(dslabs)
+data("murders")
+murders %>% mutate(rate = total/population*100000) %>%
+  group_by(region) %>%
+  summarize(avg = mean(rate)) %>%
+  mutate(region = factor(region)) %>%
+  ggplot(aes(region, avg)) +
+  geom_bar(stat="identity") +
+  ylab("Murder Rate Average")
+```
+
+and decide to move to a state in the western region. What is the main problem with this interpretation? C
+
+A. The categories are ordered alphabetically.
+-> It does not matter.
+
+B. The graph does not show standard errors.
+-> Do we need it? I do not think so.
+
+C. It does not show all the data. We do not see the variability within a region and it’s possible that the safest states are not in the West.
+->  Correct.
+
+D. The Northeast has the lowest average.
+-> Who cares?
+
+7. Make a boxplot of the murder rates defined as
+```{r}
+data("murders")
+murders %>% mutate(rate = total/population*100000)
+```
+by region, showing all the points and ordering the regions by their median rate.
+```{r}
+murders %>%
+  mutate(rate = total/population*100000) %>%
+  group_by(region) %>%
+  ggplot(aes(x = reorder(region, rate, median), y = rate)) +
+  geom_boxplot() +
+  geom_point()
+```
+
+8. The plots below show three continuous variables.
+https://rafalab.github.io/dsbook/book_files/figure-html/pseudo-3d-exercise-1.png
+
+The line x=2 appears to separate the points. But it is actually not the case, which we can see by plotting the data in a couple of two dimensional points.
+
+Why is this happening? A
+
+A. Humans are not good at reading pseudo-3D plots.
+-> Right
+
+B. There must be an error in the code.
+-> ?
+
+C. The colors confuse us.
+-> Nope.
+
+D. Scatterplots should not be used to compare two variables when we have access to 3.
+-> When we use color, scatterplots are also good geometry for comparisions.
+
+## 11.14 Case study: impact of vaccines on battling infectious diseases
+
+Vaccines have helped save millions of lives. In the 19th century, before herd immunization was achieved through vaccination programs, deaths from infectious diseases, such as smallpox and polio, were common. However, today vaccination programs have become somewhat controversial despite all the scientific evidence for their importance.
+The data used for these plots were collected, organized and distributed by the Tycho Project. They include weekly reported counts for seven diseases from 1928 to 2011, from all fifty states. We include the yearly totals in the dslabs package:
+```{r}
+library(tidyverse)
+library(dslabs)
+data(us_contagious_diseases)
+str(us_contagious_diseases)
+```
+
+We create a temporary object `dat`:
+```{r}
+# Select Measles only
+the_disease <- "Measles"
+
+# Calculate incident rate per 100000
+dat <- us_contagious_diseases %>%
+  filter(!state%in%c("Hawaii","Alaska") & disease == the_disease) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) %>% 
+  mutate(state = reorder(state, rate)) 
+```
+
+We can now easily plot disease rates per year. Here are the measles data from California:
+```{r}
+dat %>%
+  # select data of California
+  filter(state == "California" & !is.na(rate)) %>%
+  ggplot(aes(year, rate)) +
+  geom_line() + 
+  ylab("Cases per 10,000")  + 
+  # insert the time when vaccine was introduced
+  geom_vline(xintercept=1963, col = "blue")
+```
+
+Now can we show data for all states in one plot? We have three variables to show: year, state and rate. We use the geometry `geom_tile` to tile the region with colors representing disease rates.
+```{r}
+dat %>% ggplot(aes(year, state, fill = rate)) +
+  geom_tile(color = "grey50") +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "Reds"), trans = "sqrt") +
+  geom_vline(xintercept=1963, col = "blue") +
+  # make more tidy
+  theme_minimal() +  theme(panel.grid = element_blank()) +
+  ggtitle(the_disease) + 
+  ylab("") + 
+  xlab("")
+```
+
+This plot makes a very striking argument for the contribution of vaccines. However, one limitation of this plot is that it uses color to represent quantity. If we are willing to lose state information, we can make a version of the plot that shows the values with position.
+```{r}
+avg <- us_contagious_diseases %>%
+  filter(disease==the_disease) %>% group_by(year) %>%
+  summarize(us_rate = sum(count, na.rm=TRUE)/sum(population, na.rm=TRUE)*10000)
+```
+
+Now to make the plot we simply use the geom_line geometry:
+```{r}
+dat %>% 
+  filter(!is.na(rate)) %>%
+    ggplot() +
+  geom_line(aes(year, rate, group = state),  color = "grey50", 
+            show.legend = FALSE, alpha = 0.2, size = 1) +
+  geom_line(mapping = aes(year, us_rate),  data = avg, size = 1, color = "black") +
+  scale_y_continuous(trans = "sqrt", breaks = c(5, 25, 125, 300)) + 
+  ggtitle("Cases per 10,000 by state") + 
+  xlab("") + 
+  ylab("") +
+  geom_text(data = data.frame(x = 1955, y = 50), 
+            mapping = aes(x, y, label="US average"), 
+            color="black") + 
+  geom_vline(xintercept=1963, col = "blue") 
+```
+
+## 11.15 Exercises
+
+
+1. Reproduce the image plot we previously made but for smallpox. For this plot, do not include years in which cases were not reported in 10 or more weeks.
+```{r}
+dat <- us_contagious_diseases %>% 
+  filter(disease == "Smallpox" & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+
+dat %>% ggplot(aes(year, state, fill = rate)) +
+  geom_tile(color = "grey50") +
+  scale_x_continuous(expand=c(0,0)) +
+  scale_fill_gradientn(colors = RColorBrewer::brewer.pal(9, "Reds"), trans = "sqrt") +
+  theme_minimal() +  theme(panel.grid = element_blank())
+  
+```
+
+2. Now reproduce the time series plot we previously made, but this time following the instructions of the previous question.
+```{r}
+dat %>% filter(!is.na(rate)) %>%
+  group_by(state) %>%
+  ggplot(aes(year, rate)) +
+  geom_line(aes(color = state), show.legend = FALSE)
+```
+
+3. For the state of California, make a time series plots showing rates for all diseases. Include only years with 10 or more weeks reporting. Use a different color for each disease.
+```{r}
+dat <- us_contagious_diseases %>%
+  filter(state == 'California' & !is.na(population)) %>%
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting)
+
+dat %>%
+  filter(!(weeks_reporting < 9)) %>%
+  group_by(disease) %>%
+  ggplot(aes(year, rate, color = disease)) +
+  geom_line()
+```
+
+4. Now do the same for the rates for the US. Hint: compute the US rate by using summarize, the total divided by total population.
+```{r}
+us_contagious_diseases %>%
+  group_by(disease, year) %>%
+  summarize(total_rate = sum(count, na.rm = TRUE) / sum(population, na.rm = TRUE) * 10000) %>%
+  ggplot(aes(year, total_rate, color = disease)) +
+  geom_line()
+```

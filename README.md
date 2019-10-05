@@ -27,10 +27,10 @@
 [data_visualization_in_practice_20191002_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1002_10/data_visualization_in_practice_20191002_172_lee.nb.html)
 
 ### 1007_11
-[data_visualization_principles_20191007_172_lee.Rmd]
+[data_visualization_principles_20191007_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1007_11/data_visualization_principles_20191007_172_lee.Rmd)
 
-### 1009_12
-[robust_summaries_20191009_172_lee.Rmd]
+### 1014_12
+[robust_summaries_20191009_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1014_12/robust_summaries_20191002_172_lee.nb.html)
 
 ## Tutorials
 
