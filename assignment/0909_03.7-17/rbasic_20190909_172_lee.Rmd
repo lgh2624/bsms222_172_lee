@@ -346,12 +346,14 @@ Use the 'rank' function to determine the population rank of each state from smal
 ```{r}
 ranks <- rank(murders$population)
 my_df <- data.frame(state = murders$state, rank = ranks)
+my_df
 ```
 
 6. Repeat the previous exercise, but this time order 'my_df' so that the states are ordered from least populous to most populous. Hint: create an object 'ind' that stores the indexes needed to order the population values. Then use the bracket operator '[' to re-order each column in the data frame.
 ```{r}
 ind <- order(murders$population)
 my_df <- data.frame(state = murders$state[ind], abb = murders$abb[ind], region = murders$region[ind], population = murders$population[ind], total = murders$total[ind])
+my_df
 ```
 
 7. The 'na_example' vector represents a series of counts. You can quickly examine the object using:

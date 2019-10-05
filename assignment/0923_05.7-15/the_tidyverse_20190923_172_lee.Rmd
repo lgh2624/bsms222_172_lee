@@ -534,4 +534,6 @@ func <- function(n){
 df <- data.frame(n = seq(1,100)) %>%
   cbind(s_n = map_df(n, func)) %>%
   mutate(s_n_2 = s_n)
+
+df
 ```
