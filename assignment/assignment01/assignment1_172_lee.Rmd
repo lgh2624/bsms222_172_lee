@@ -1,0 +1,223 @@
+---
+title: "Assignment 1"
+output: html_notebook
+---
+
+# 1. 질문 선정
+유전병(모든 유전적 형질)은 이형접합체에서 발현되면 우성(Dominant)이고 발현되지 않으면 열성(Recessive)이라 한다. 우성과 열성을 구분하는 요소가 있을까? 특정 유전형질, 이번 note에서는 발달기 유전질환을 중심으로 탐구할 것이다.
+
+
+# 2. 데이터 준비
+이번 과제에서 필요한 라이브러리로는 다음의 것들이 필요하다:
+```{r}
+library(tidyverse)
+library(purrr)
+library(ggplot2)
+library(ggridges)
+library(cowplot)
+```
+
+먼저 DDG2P와 HPO의 데이터를 불러온다.
+```{r}
+DDG2P <- read_delim("DDG2P_24_9_2019.with_pLI.txt",
+                    delim='\t', progress = F)
+HPO <- read_delim("table.hpo_obo_20190924.txt",
+                  delim='\t', progress = F)
+```
+
+HPO는 The Human Phenotype Ontology의 약자로 각 질환의 phenotype을 기술하는 용어와 이를 상징하는 코드를 담고 있다.
+우리가 알고 싶은 내용은 유전 질환의 우성, 열성 여부이다. 이때, 성염색체는 제외하고 상염색체(Autosomal)의 우열만을 검색해보자.
+```{r}
+HPO %>% filter(grepl("Autosomal", name))
+```
+상염색체 우성(AD)는 HP:0000006, 상염색체 열성(AR)은 HP:0000007을 id로 가진다. 나머지 다섯 가지는 실제로 DDG2P에서 검색되지 않으므로 제외하도록 한다.
+
+## 2.1 장기 특이적 리스트
+
+그럼 유전질환의 우열을 따질때, 어떤 변수를 생각해볼 수 있을까? DDG2P에는 `organ specificity list`라는 column이 있다. 유전질환이 발현되는 장기의 목록으로 `;`으로 구분되어 있는 string이다.
+어떤 장기가 포함되어 있는지 알 수 없으므로 이를 목록화 하도록 한다.
+```{r}
+organ_list <- DDG2P %>% 
+  filter(!is.na(`organ specificity list`)) %>%
+  .$`organ specificity list` %>% # `organ specificity list`를 선택한다
+  paste(collapse = ';') %>% # 각 원소를 ';'으로 잇는다.
+  strsplit(";") # ';'기준으로 split한 array를 만든다.
+
+head(organ_list[[1]]) # output 1
+
+organ_list <- as.data.frame(organ_list[[1]]) # column 이름이 'organ'인 data frame을 만든다.
+colnames(organ_list) <- c("organ") 
+
+organ_list <- count(organ_list, organ) # 종류별로 count한다.
+organ_list # output 2
+```
+
+DDG2P에서 다루는 장기의 종류는 25종류임을 알 수 있다.
+이때, 발현되는 유전질환의 종류가 적은 9개 기관을 제외하고, `Eye`를 포함하는 항목은 모두 `Eye`에 포함시키도록 했다.
+```{r}
+except <- c("Cancer predisposition",
+            "Endocrine",
+            "Eye: Lens",
+            "Eye: Retina",
+            "Hair/Nails",
+            "Liver",
+            "Lungs",
+            "Multisystem",
+            "Genitalia",
+            "Peripheral nerves",
+            "Respiratory tract")
+
+organ_list <- organ_list %>% filter(!(organ %in% except))
+organ_list
+```
+
+먼저 우성, 열성 유전되는 전체 유전자수를 조사해보자:
+```{r}
+d <- bind_rows(
+  DDG2P %>% filter(
+    grepl('HP:0000006', .$phenotypes) & !grepl('HP:0000007', .$phenotypes)) %>%
+    mutate(type = 'AD'),
+  
+  DDG2P %>%  filter(
+    !grepl('HP:0000006', .$phenotypes) & grepl('HP:0000007', .$phenotypes)) %>%
+    mutate(type = 'AR')
+  )
+
+d %>% ggplot(aes(type, fill = type)) +
+  geom_bar() +
+  theme(legend.position = "none") +
+  coord_flip()
+```
+대략 열성 유전이 우성 유전의 두배 가량이 되는 것을 알 수 있다.
+
+그렇다면 이런 경향성이 모든 장기에 대해 비슷하게 나타날까? 각 장기별 우성, 열성 유전자의 개수는 다음과 같다.
+```{r}
+organs <- mutate(
+  organ_list,
+  n = lapply(organ_list$organ, function(x){
+    nrow(filter(DDG2P, grepl(x, `organ specificity list`)))})) # 각 장기에서 발현되는 유전질환의 개수를 세어 column 'n'에 저장
+
+organs <- rbind(
+  mutate(organ_list, type = "AD", # column 'type'에 "AD"를 입력하고
+    freq = lapply(organ_list$organ, function(x){ # 각 장기에서 발현되는 우성유전질환의 개수를 'freq'에 저장
+      nrow(filter(DDG2P, grepl("HP:0000006", phenotypes) &
+                    !grepl('HP:0000007', phenotypes) &
+                    grepl(x, `organ specificity list`)))})),
+  
+  mutate(organ_list, type =  "AR", # column 'type'에 "AR"를 입력하고
+    freq = lapply(organ_list$organ, function(x){ # 각 장기에서 발현되는 열성유전질환의 개수를 'freq'에 저장
+      nrow(filter(DDG2P, !grepl("HP:0000006", phenotypes) &
+                    grepl('HP:0000007', phenotypes) &
+                    grepl(x, `organ specificity list`)))}))
+)
+organs <- organs %>%
+  mutate(organ = as.factor(organs$organ),
+         freq = as.numeric(organs$freq))
+
+organs
+```
+
+이를 그래프로 나타내면,
+```{r}
+organs %>% 
+  ggplot(aes(reorder(organ, desc(n)))) +
+  geom_bar(aes(y = c(n[1:14], rep(0,14)), fill = 'Total'),
+           stat = "identity") +
+  geom_bar(aes(y = freq, fill = type),
+           stat = "identity", position = "dodge") +
+  labs(x = "organs",
+       y = "number of genes",
+       legend = "Types",
+       title = "Organ Specific Numer of Dominant/Reccesive Genes") +
+  theme(axis.text.x = element_text(size=8, angle = 45, hjust = 1, vjust = 1)) +
+  scale_fill_manual(name = "Types", values = c('#f8766d', '#00bfc4', 'grey'))
+```
+
+이 그래프는 단순히 유전자의 개수를 나타냈으므로 경향을 파악하기 어렵다. 따라서 이를 비율로 나타내면, 다음과 같다.
+```{r}
+organs <- mutate(organs, rate = freq / n)
+organs %>% mutate(organ = c(organ_axis, organ_axis)) %>%
+  ggplot(aes(organ)) +
+  geom_bar(aes(y = c(rep(1, 14), rep(0, 14))), fill = 'grey', stat = "identity") +
+  geom_bar(aes(y = rate,  fill = type), stat = "identity") +
+  labs(x="organs", y= "rates", title = "Organ Specific Gene Dominant/Reccesive Ratio") +
+  
+  theme(axis.text.x = element_text(size=8, angle = 45, hjust = 1, vjust = 1))
+```
+즉, 장기별로 유전자의 우열의 경향성을 나타내지는 않는다.
+
+## 2.2 pLI
+pLI는 유전자가 기능 상실에 대해 얼마나 내성이 적은지 나타내는 지표이다. (probability of that a gene is intolerant to a Loss of Function (LoF) mutation) 0-1 정도의 값으로 계산되며 높을 수록 기능 상실 내성이 적고 (LoF intolerant) 작을 수록 내성이 크다 (LoF tolerant).
+pLI가 우성과 열성 유전을 가르는 데 영향을 미칠 것이라고 생각하여 유전자의 pLI 분포에 대해 조사하고자 한다.
+
+먼저 주어진 dataset의 pLI를 그래프로 나타내면 다음과 같이 나타난다.
+```{r}
+d %>% ggplot(aes(x = pLI)) +
+  geom_density(aes(fill = type), alpha = 0.7, position = "stack") +
+  theme(legend.position = "none")
+
+d %>% ggplot(aes(x = pLI)) +
+  geom_density_ridges(aes(y= type, fill = type), jittered_points = TRUE, 
+                      position = position_points_jitter(width = 0.05, height = 0),
+                      point_shape = '|', point_size = 3, point_alpha = 0.2, alpha = 0.7, scale = 1.3) +
+  theme_ridges() +
+  theme(legend.position = "none")
+```
+우성 유전 유전자는 그래프가 1 근처에서 최대이고, 열성유전 유전자는 0 근처에서 최대이다.
+
+만일 pLI가 유전질환 유전자의의 우열에 연관이 있다면 장기별 그래프도 전체적인 경향성을 따라 갈 것이다.
+
+```{r}
+organ_axis = c("Bone Marrow\nImmune",
+               "Brain\nCognition",
+               "Ear",
+               "Endocrine\nMetabolic",
+               "Eye",
+               "Face",
+               "GI tract", 
+               "Heart/Lymphatic\nCardiovasculature",
+               "Kidney Renal Tract",
+               "Musculature", 
+               "Skeleton",
+               "Skin",
+               "Spinal cord\nPeripheral nerves",
+               "Teeth\nDentitian")
+i = 1
+d1 <- d %>%
+  filter(grepl(organ_list$organ[i], `organ specificity list`)) %>%
+  mutate(organ = organ_axis[i])
+for(i in 2:14){
+  d1 <- rbind(d1, d %>%
+    filter(grepl(organ_list$organ[i], `organ specificity list`)) %>%
+    mutate(organ = organ_axis[i]))
+}
+d1$organ <- as.factor(d1$organ)
+d1 %>% select(`gene symbol`, `disease mim`, `organ specificity list`, pLI, type, organ)
+```
+
+`d1`을 이용해 그래프를 나타내어 보면, 다음과 같고,
+```{r}
+p <- d1 %>%
+  group_by(organ, type) %>%
+  ggplot(aes(x = pLI, y = organ, fill = organ)) +
+  geom_density_ridges(#stat = 'binline', binwidth = 0.02,
+                      alpha = 0.6, 
+                      jittered_points = TRUE,
+                      #position = position_points_jitter(width = 0.05, height = 0),
+                      point_shape = 23, point_size = 0.5, point_alpha = 0.5,
+                      ) + 
+  lims(x=c(-0.00,1.00))+
+  facet_wrap(~ type) +
+  theme(legend.position = "none") +
+  labs(title = "Organ Specific pLI Distribution",
+       y = "")
+p
+
+ggsave("assignment01_1017.organ_specific_pLI_distribution.20191017.pdf", p,
+       width = 5, height = 8)
+```
+각 장기별 그래프가 전체적인 경향성을 따름을 알 수 있다.
+
+# 3. 결론
+유전질환 유전자의 우열을 알아보기 위하여 DDG2P dataset의 organ specificity list와 pLI를 이용해 plotting을 한 결과 우성 유전은 주로 pLI값이 높았고, 열성 유전은 pLI값이 낮았다. 또한 각 장기에서 얻은 그래프가 전체의 분포와 비슷함을 통해 전체적인 경향성을 나타냄을 보였다.
+다만, 열성 유전에서는 pLI가 0인 peak가 지배적으로 나타나긴 하지만, 우성 유전에서도 0 근처의 peak가 높게 나타나고 크기가 반대인 장기도 존재하므로 pLI가 작은 유전자라고 해서 열성 유전이라고 할 수는 없을 것이다. 또한 중간 크기의 pLI에서는 우열을 따질 방법이 없으므로 이 역시 부족한 부분이라 할 수 있을 것이다.
