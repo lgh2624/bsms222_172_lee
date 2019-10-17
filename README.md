@@ -1,6 +1,6 @@
 # bsms222_172_lee
 
-## Assignment Assemble
+## Textbook Notes
 
 ### 0906_03.2-6
 [rbasic_20190906_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/0906_03.2-6/rbasic_20190906_172_lee_nd.html)
@@ -48,6 +48,11 @@
 
 ### Analysis of genetic variants from general population
 []
+
+## Assignments
+
+### Assignment 1
+[assignment1_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/assignment01/assignment1_172_lee.nb.html)
 
 ## Quizes
 
