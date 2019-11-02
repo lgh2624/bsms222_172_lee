@@ -1,0 +1,657 @@
+---
+title: "Probability"
+output: html_notebook
+---
+
+# 13 Probability
+
+One of the goals of this part of the book is to help us understand how probability is useful to understand and describe real-world events when performing data analysis. Probability Theory was born. Probability continues to be highly useful in modern games of chance. Probability theory is useful in many other contexts and, in particular, in areas that depend on data affected by chance in some way.
+```{r}
+library(dslabs)
+library(tidyverse)
+library(ggplot2)
+```
+
+## 13.1 Discrete probability
+
+The subset of probability related to categorical data is referred to as 'discrete probability'. And we will expand this to numeric or continuous data.
+
+### 13.1.1 Relative frequency
+
+At here, we will think each real objects as virtual colored balls and we call it as 'urn problem'. For urn problem, a way to think about the probability of an event is as the proportion of times the event occurs when we repeat the experiment an infinite number of times, independently, and under the same conditions.
+For example, if there is 5 beads where 2 of them are red, 3 of them are blue, the probability of picking red is 2/5 = 0.4 and blue is 3/5 = 0.6.
+
+### 13.12. Notation
+
+We use P(A)/Pr(A) to denote the probability of event A happening. For gerneral, the term 'event' means things that can happen when something occurs by chance. If the data is a numeric or continuous data, we can write that as X > n.
+
+### 13.1.3 Probability distributions
+
+If we know the relative frequency of the different categories, defining a distribution for categorical outcomes is relatively straightforward.
+
+## 13.2 Monte Carlo simulations for categorical data
+
+We can represent example of beads with R and function `rep`:
+```{r}
+beads <- rep(c("red", "blue"), times = c(2, 3))
+beads
+```
+
+And we can pick a random bead with using the function `sample`
+```{r}
+sample(beads, 1)
+```
+
+If we repeat this code infinte times, we can calculate real probability of each events. Since we cannot do this, we repeat finite times large enough to get probability. We call it as 'Monte Carlo simulation'
+We have to explain how many times need to repeat with mathmatical and statistical descriptions but we will learn about practical useages.
+
+For this example, we will repeat 10000 times.
+```{r}
+B <- 10000
+events <- replicate(B, sample(beads, 1))
+```
+
+And use function `table`:
+```{r}
+tab <- table(events)
+tab
+```
+
+and we get proportions with function `prop.table`
+```{r}
+prop.table(tab)
+```
+
+Generally, when the number of repeat times increases, the precision of probability of events also increases.
+
+### 13.2.1 Setting the random seed
+
+We can change random seed with function `set.seed`
+```{r}
+set.seed(1986)
+```
+
+For more information:
+```{r}
+?set.seed
+```
+
+### 13.2.2 With and without replacement
+
+We can repeat codes without function `replicate`, just change the argument in the function `sample`:
+```{r}
+sample(beads, 5)
+sample(beads, 5)
+sample(beads, 5)
+```
+
+If we repeats 6 times:
+```{r}
+sample(beads, 6)
+```
+there is an error.
+Because that code means sampling without replacement. So, we should change sampling method with replacement changeing argument `replace` to `T`
+```{r}
+events <- sample(beads, B, replace = T)
+prop.table(table(events))
+```
+
+## 13.3 Independence
+
+We say two events are independent if the outcome of one does not affect the other.
+
+## 13.4 Conditional probabilities
+
+We use the | as shorthand for "given that" or "conditional on", and when two events, say A and B, are independent we have: P(A|B) = P(A).
+
+## 13.5 Addition and multiplication rules
+
+### 13.5.1 Multiplication rule
+
+두 사건 A, B가 동시에 일어날 확률은
+The probability where two events A and B occur at once is:
+P(A and B) = P(A ∩ B) = P(A)P(B|A)
+
+and, we refer it as multiplication rule.
+
+Also from P(A ∩ B) = P(A)P(B|A), we can derive P(B|A) = P(A ∩ B) / P(A).
+We use this formula to get conditional probabilities.
+
+Furthermore, the probablity where three events A, B and C occur at once can be derived like this:
+P(A and B and C)
+= P(A ∩ B ∩ C)
+= P((A ∩ B) ∩ C)
+= P(A ∩ B)P(C|(A ∩ B))
+= P(A)P(B|A)P(C|(A ∩ B))
+
+### 13.5.2 Multiplication rule under independence
+
+If three events A, B, C are independent, by definition:
+P(B|A) = P(B), P(C|(A ∩ B)) = P(C)
+and below holds:
+P(A and B and C) = P(A)P(B|A)P(C|(A ∩ B)) = P(A)P(B)P(C)
+
+### 13.5.3 Addition rule
+
+두 사건 A, B에 대해 A또는 B가 일어날 확률은
+The probability where two events A or B occur is:
+P(A or B) = P(A ∪ B) = P(A) + P(B) - P(A ∩ B)
+We can easily find it with a Venn diagram.
+
+## 13.6 Combinations and permutations
+
+How we get probability if the problem be more complicated? 
+For instance, we want to get the probability of flush when we get five playing cards in poker.
+For this, we can use the function `paste` and `expand.grid`.
+The function `paste` can paste two characters or vectors and function `expand.grid` can combine multiple vectors as long format:
+```{r}
+number <- "Three"
+suit <- "Hearts"
+paste(number, suit)
+
+paste(letters[1:5], as.character(1:5))
+
+expand.grid(pants = c("blue", "black"), shirt = c("white", "grey", "plaid"))
+```
+
+For a deck of playing cards:
+```{r}
+suits <- c("Diamonds", "Clubs", "Hearts", "Spades")
+numbers <- c("Ace", "Deuce", "Three", "Four", "Five", "Six", "Seven", 
+             "Eight", "Nine", "Ten", "Jack", "Queen", "King")
+deck <- expand.grid(number=numbers, suit=suits)
+deck <- paste(deck$number, deck$suit)
+```
+
+Since the probability of picking a king when we pick a card in the deck is 1/13, the result of the simulation also would be so:
+```{r}
+kings <- paste("King", suits)
+mean(deck %in% kings)
+```
+
+And the probability of picking a king after removed any one king card from the deck would be 3/51.
+
+But if we want list of all of cases, we can use the function `permutations` from the package **package**:
+```{r}
+library(gtools)
+permutations(3, 2)
+```
+For permutations, any cases of repetition would not be concerned.
+
+With using argument `v`, we can change the list that we want:
+```{r}
+all_phone_numbers <- permutations(10, 7, v = 0:9)
+n <- nrow(all_phone_numbers)
+index <- sample(n, 5)
+all_phone_numbers[index,]
+```
+
+To compute probability where second card is a king after picking a king for first card:
+```{r}
+# Get all cases of picking two cards from the deck without repetition
+hands <- permutations(52, 2, v = deck)
+
+# make vectors of first/second card of each cases
+first_card <- hands[,1]
+second_card <- hands[,2]
+
+# compute all cases of picking a king for first card from `hands`
+kings <- paste("King", suits)
+sum(first_card %in% kings)
+
+# compute fraction of cases that second one is a king by cases that first card is a king to get the conditional probability 
+sum(first_card%in%kings & second_card%in%kings) / sum(first_card%in%kings)
+
+# function `sum` can be replaced with `mean`
+mean(first_card%in%kings & second_card%in%kings) / mean(first_card%in%kings)
+```
+The last code line means P(A|B) = P(A ∩ B) / P(A) in R
+
+If the order does not matter like 'Natural 21' that the case of you get an Ace and a face card, we can use 'combinations'.
+```{r}
+combinations(3, 2)
+```
+
+The probability of Natural 21 can be computed by:
+```{r}
+# set matrix: replace names of target cards with other name
+aces <- paste("Ace", suits)
+
+facecard <- c("King", "Queen", "Jack", "Ten")
+facecard <- expand.grid(number = facecard, suit = suits)
+facecard <- paste(facecard$number, facecard$suit)
+
+# get all combinations of cases of picking two cards
+hands <- combinations(52, 2, v = deck)
+# compute probability
+mean(hands[,1] %in% aces & hands[,2] %in% facecard)
+```
+
+This line will give same answer 
+```{r}
+mean(
+  # cases that first is A and second is face card
+  (hands[,1] %in% aces & hands[,2] %in% facecard) | 
+    # cases that first is face card and second is A
+    (hands[,2] %in% aces & hands[,1] %in% facecard))
+```
+
+### 13.6.1 Monte Carlo example
+
+The method before is the way computing theoretical probability. If we compute probability with statisticai way, we use Monte Carlo simulations.
+For example, we can compute the probability of Natural 21 in blackjack:
+```{r}
+# draw two card in the deck without replacements
+hand <- sample(deck, 2)
+hand
+
+# check if `hand` is blackjack
+(hands[1] %in% aces & hands[2] %in% facecard) | 
+  (hands[2] %in% aces & hands[1] %in% facecard)
+
+# make a function to repeat this for many times(B = 10000)
+blackjack <- function(){
+   hand <- sample(deck, 2)
+  (hand[1] %in% aces & hand[2] %in% facecard) | 
+    (hand[2] %in% aces & hand[1] %in% facecard)
+}
+
+# check function
+blackjack()
+
+# run function 10000 times
+B <- 10000
+results <- replicate(B, blackjack())
+
+# compute the probability
+mean(results)
+```
+
+## 13.7 Examples
+
+### 13.7.1 Monty Hall Problem
+
+Monty Hall problem is originated from a TV show that the guest select a door among three doors; there is a car or two goats. After the guest selects any door, the host opens a door in front of a goat between two doors except door the guest selected. Now, the guest has two choices; to stick to or switch the first choice. For this situation, which chioce is more probable to win a car?
+```{r}
+# set repeat times
+B <- 10000
+
+# make function about Monty Hall Game
+monty_hall <- function(strategy){
+  # set doors and prizes
+  doors <- as.character(1:3)
+  prize <- sample(c("car", "goat", "goat"))
+  prize_door <- doors[prize == "car"]
+  # pick a door (first one)
+  my_pick  <- sample(doors, 1)
+  # open one of goat doors
+  show <- sample(doors[!doors %in% c(my_pick, prize_door)],1)
+  # the case of sticking to first pick
+  stick <- my_pick
+  # get prize of first pick
+  stick == prize_door
+  # the case of switching to another door
+  switch <- doors[!doors%in%c(my_pick, show)]
+  choice <- ifelse(strategy == "stick", stick, switch)
+  # get prize of second pick
+  choice == prize_door
+}
+
+# compute probability of tha case of sticikng to first pick
+stick <- replicate(B, monty_hall("stick"))
+mean(stick)
+
+# compute probability of tha case of switching to another door
+switch <- replicate(B, monty_hall("switch"))
+mean(switch)
+```
+If you stick to the first pick, the probability of winning a car will b e just 1/3, whereas switching has probability of 2/3.
+
+### 13.7.2 Birthdat problem
+
+For 50 people, what is the probablity of at least two people have the same bithday in that group?
+In this problem, we will use the function `duplicated` which returns `true` when there is already the same value in front of each element in the vector.
+```{r}
+duplicated(c(1,2,3,1,4,3,5))
+```
+
+Return to bithday problem:
+```{r}
+# make a sample group of birthday for 50 people
+n <- 50
+bdays <- sample(1:365, n, replace = TRUE)
+
+# find whether there is same number(birthday)
+any(duplicated(bdays))
+
+# set repeating number 
+B <- 10000
+
+# make function to
+same_birthday <- function(n){
+  # make a sample group
+  bdays <- sample(1:365, n, replace=TRUE)
+  # and check the group
+  any(duplicated(bdays))
+}
+
+# compute the probability that the sample has at least two people has the same bithday
+results <- replicate(B, same_birthday(50))
+mean(results)
+```
+
+Then, we can compute probabilities of other n with the same way, and we can calculate theoretical probabilities by simple mathmatics:
+```{r}
+# function to compute statistical probability of group of n
+compute_prob <- function(n, B=10000){
+  results <- replicate(B, same_birthday(n))
+  mean(results)
+}
+
+# get list of statistical probabilities of n from 1 to 60
+n <- seq(1,60)
+prob <- sapply(n, compute_prob)
+
+# function to compute theoretical probability of group of n
+exact_prob <- function(n){
+  prob_unique <- seq(365,365-n+1)/365 
+  1 - prod( prob_unique)
+}
+
+# get list of theoretical probabilities of n from 1 to 60
+eprob <- sapply(n, exact_prob)
+
+# plot it
+qplot(n, prob) + geom_line(aes(n, eprob), col = "red")
+```
+If B is large enough, the probability would be accuracy enough.
+
+## 13.8 Infinity in practice
+
+Of course, the larger the size of B, the higher the accuracy. Then, how large B can ensure enough accuracy?
+
+For group of n = 25, we can compute probabities changing the size of B:
+```{r}
+B <- 10^seq(1, 5, len = 100)
+compute_prob <- function(B, n=25){
+  same_day <- replicate(B, same_birthday(n))
+  mean(same_day)
+}
+prob <- sapply(B, compute_prob)
+qplot(log10(B), prob, geom = "line") + geom_line(y=0.569, color = "red")
+```
+
+## 13.9 Exercises
+
+1. One ball will be drawn at random from a box containing: 3 cyan balls, 5 magenta balls, and 7 yellow balls. What is the probability that the ball will be cyan?
+
+P(cyan) = 3/(3+5+7) = 3/15 = 0.2
+
+2. What is the probability that the ball will not be cyan?
+
+1 - P(cyan) = 0.8
+
+3. Instead of taking just one draw, consider taking two draws. You take the second draw without returning the first draw to the box. We call this sampling without replacement. What is the probability that the first draw is cyan and that the second draw is not cyan?
+
+A: the case of the first draw is cyan
+B: the case of the second draw is not cyan
+P(A) = 0.2 (from ex.1)
+P(B|A) = 2/14
+Therefore, P(A and B) = P(A)P(B|A) = 1/35
+
+
+4. Now repeat the experiment, but this time, after taking the first draw and recording the color, return it to the box and shake the box. We call this sampling with replacement. What is the probability that the first draw is cyan and that the second draw is not cyan?
+
+In this case, A and B are independent so P(B|A) = P(B) = 0.8 (from ex.2)
+Therefore, P(A and B) = P(A)P(B|A) = P(A)P(B) = 0.16
+
+5. Two events A and B are independent if P(A and B) = P(A)P(B). Under which situation are the draws independent?: b
+
+a. You don’t replace the draw.
+b. You replace the draw.
+c. Neither
+d. Both
+
+6. Say you’ve drawn 5 balls from the box, with replacement, and all have been yellow. What is the probability that the next one is yellow?
+
+P(yellow) = 7/(3+5+7) = 7/15
+
+7. If you roll a 6-sided die six times, what is the probability of not seeing a 6?
+
+The probability of not seeing a 6 of each trial is 5/6. Therefore the probability of not seeing a 6 for 6 trials is (5/6)^6 ~ 0.335
+
+8. Two teams, say the Celtics and the Cavs, are playing a seven game series. The Cavs are a better team and have a 60% chance of winning each game. What is the probability that the Celtics win **at least** one game?
+
+For seven times, the probability that the Celtics loses all games is 0.6^7 ~ 0.028.
+So, the probability the Celtics win at least one game is 1 - 0.028 = 0.972
+
+9. Create a Monte Carlo simulation to confirm your answer to the previous problem. Use `B <- 10000` simulations. Hint: use the following code to generate the results of the first four games:
+
+`celtic_wins <- sample(c(0,1), 4, replace = TRUE, prob = c(0.6, 0.4))`
+```{r}
+B <- 10000
+celtic_wins <- sample(c(0,1), 4, replace = TRUE, prob = c(0.6, 0.4))
+any(celtic_wins == 1)
+
+compute <- function(B){
+  celtic_wins <- replicate(B, any(1 == sample(c(0,1), 4, replace = TRUE, prob = c(0.6, 0.4))))
+  mean(celtic_wins)
+}
+
+compute(B)
+```
+The Celtics must win one of these 4 games.
+(But 13% is high probability to happen...lol)
+
+10. Two teams, say the Cavs and the Warriors, are playing a seven game championship series. The first to win four games, therefore, wins the series. The teams are equally good so they each have a 50-50 chance of winning each game. If the Cavs lose the first game, what is the probability that they win the series?
+
+The Cavs should win more than 4 games among 6. So, (<sub>6</sub>C<sub>4</sub> + <sub>6</sub>C<sub>5</sub> + <sub>6</sub>C<sub>6</sub>)*0.5<sup>6</sup> = 22/64 ~ 0.34375
+
+11. Confirm the results of the previous question with a Monte Carlo simulation.
+```{r}
+B = 10000
+compute <- function(B){
+  celtic_wins <- replicate(B, sum(sample(c(0,1), 6, replace = T, prob = c(0.5, 0.5))))
+  mean(celtic_wins >= 4)
+}
+
+compute(B)
+
+```
+
+12. Two teams, A and B, are playing a seven game series. Team A is better than team B and has a p > 0.5 chance of winning each game. Given a value p, the probability of winning the series for the underdog team B can be computed with the following function based on a Monte Carlo simulation:
+```
+prob_win <- function(p){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), 7, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=4
+  })
+  mean(result)
+}
+```
+Use the function `sapply` to compute the probability, call it `Pr`, of winning for `p <- seq(0.5, 0.95, 0.025)`. Then plot the result.
+```{r}
+prob_win <- function(p){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), 7, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=4
+  })
+  mean(result)
+}
+
+p <- seq(0.5, 0.95, 0.025)
+q <- 1-p
+Pr <- sapply(p, prob_win)
+qplot(p, Pr) + geom_line(aes(p, 35*p^3*q^4 + 21*p^2*q^5 + 7*p*q^6 + q^7), col = "red")
+```
+
+13. Repeat the exercise above, but now keep the probability fixed at p <- 0.75 and compute the probability for different series lengths: best of 1 game, 3 games, 5 games,… Specifically, N <- seq(1, 25, 2). Hint: use this function:
+
+prob_win <- function(N, p=0.75){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), N, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=(N+1)/2
+  })
+  mean(result)
+}
+
+## 13.10 Continuous probability
+
+Unlike for categorical data, probabilities regarded to freqency or size is improper for continuous data because each element datum in continuous data are not exactly same like heights of each people. So, we would use other methods to describe the probabilty of the data. In general, we use the cumulative distribution function (CDF). For real data, we can use empirical cumulative distribution function (eCDF). In R:
+```{r}
+data(heights)
+x <- heights %>% filter(sex=="Male") %>% pull(height)
+
+# define F as empirical distribution function
+F <- function(a) mean(x<=a)
+
+# compute probability that the height of a boy is larger than 70 inches
+1 - F(70)
+```
+
+A general way to compute probability that the height of a boy is between a and b is
+```
+F(b)-F(a)
+```
+
+## 13.11 Theoretical continuous distributions
+
+Most of natural continuous distributions can be approximated to proper normal distributions. For a data that has average `m` and standard deviation `s` it might follow N(m, s^2)(means a normal distribution that has average `m` and standard deviation `s` ) and use function `pnorm` in R
+```
+F(a) - pnorm(a, m ,s)
+```
+
+For the example above,
+```{r}
+m <- mean(x)
+s <- sd(x)
+1 - pnorm(70.5, m, s)
+```
+
+### 13.11.1 Theoretical distributions as approximations
+
+In the case of continuous data, we use the probabaility of the range instead of each value as we described above. Therefore we approximate data to continuous distributions even though we measured one by one. It might be useful than using real values without losing that much information. For example, we may compare real fraction and probability computed with normal distribution with data `height`:
+```{r}
+mean(x <= 68.5) - mean(x <= 67.5)
+
+mean(x <= 69.5) - mean(x <= 68.5)
+
+mean(x <= 70.5) - mean(x <= 69.5)
+```
+
+```{r}
+pnorm(68.5, m, s) - pnorm(67.5, m, s) 
+
+pnorm(69.5, m, s) - pnorm(68.5, m, s) 
+
+pnorm(70.5, m, s) - pnorm(69.5, m, s) 
+```
+
+Two data are looks simillar. However, the approximation is not as useful for other intervals. 
+```{r}
+mean(x <= 70.9) - mean(x<=70.1)
+
+pnorm(70.9, m, s) - pnorm(70.1, m, s)
+```
+
+They are different about four times. We call this as discretization, the reported heights tend to be more common at discrete values. But approximation can be very useful.
+
+### 13.11.2 The probability density
+
+For continuous data, the probability does not be provided. Instead of probability, there is a function called the probability density. It does not refer probabilities itself but, its area below the graph means real probability. If we define probability and density function as F and f in the fomular below respectively,
+F(a) = P(X < a) = integral(a, -infinite)f(x)dx
+
+For example, to use the normal approximation to estimate the probability of someone being taller than 76 inches, we use:
+```{r}
+1 - pnorm(76, m, s)
+```
+
+## 13.12 Monte Carlo simulations for continuous variables
+
+The probability of continuous data can be computed with Monte Carlo simulations. For examlpe, we can pick 800 people with height that following a normal distribution that has avg of m, s.d of s. Then, what is the distribution of the tallest person of each groups?
+```{r}
+B <- 10000
+tallest <- replicate(B, {
+  simulated_data <- rnorm(800, m, s)
+  max(simulated_data)
+})
+
+mean(tallest >= 84)
+
+tallest %>% as.data.frame() %>% ggplot() + geom_histogram(aes(.), binwidth = 0.2)
+```
+It does not looks a normal distribution.
+
+## 13.13 Continuous distributions
+
+If we approximate and convert some normal distributions, but we can use other distributions like the student-t, Chi-square, exponential, gamma, beta, and beta-binomial. In R, R provides density as `d`, quantiles as `q`, cumulative as `p` and Monte Carlo as `r`. We can draw a normal distribution graph with the function `dnorm`:
+```{r}
+x <- seq(-4, 4, length.out = 100)
+qplot(x, f, geom = "line", data = data.frame(x, f = dnorm(x)))
+```
+
+And `t` refers the student-t distribution. We will learn in Ch16:
+```{r}
+x <- seq(-4, 4, length.out = 100)
+qplot(x, f, geom = "line", data = data.frame(x, f = dt(x, df = 3)))
+```
+
+## 13.14 Exercises
+
+1. Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and a standard deviation of 3 inches. If we pick a female at random, what is the probability that she is 5 feet or shorter?
+```{r}
+pnorm(60, 64, 3)
+```
+
+2. Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and a standard deviation of 3 inches. If we pick a female at random, what is the probability that she is 6 feet or taller?
+```{r}
+1 - pnorm(72, 64, 3)
+```
+
+3. Assume the distribution of female heights is approximated by a normal distribution with a mean of 64 inches and a standard deviation of 3 inches. If we pick a female at random, what is the probability that she is between 61 and 67 inches?
+```{r}
+pnorm(67, 64, 3) - pnorm(61, 64, 3)
+```
+
+4. Repeat the exercise above, but convert everything to centimeters. That is, multiply every height, including the standard deviation, by 2.54. What is the answer now?
+```{r}
+pnorm(60*2.54, 64*2.54, 3*2.54)
+1 - pnorm(72*2.54, 64*2.54, 3*2.54)
+pnorm(67*2.54, 64*2.54, 3*2.54) - pnorm(61*2.54, 64*2.54, 3*2.54)
+```
+
+5. Notice that the answer to the question does not change when you change units. This makes sense since the answer to the question should not be affected by what units we use. In fact, if you look closely, you notice that 61 and 64 are both 1 SD away from the average. Compute the probability that a randomly picked, normally distributed random variable is within 1 SD from the average.
+```{r}
+pnorm(1) - pnorm(-1)
+```
+
+6. To see the math that explains why the answers to questions 3, 4, and 5 are the same, suppose we have a random variable with average m and standard error s. Suppose we ask the probability of X being smaller or equal to a. Remember that, by definition, a is (a-m)/s standard deviations s away from the average m. The probability is: P(X ≤ a)
+Now we subtract μ to both sides and then divide both sides by σ: P((X − m) / s ≤ (a − m) / s)
+The quantity on the left is a standard normal random variable. It has an average of 0 and a standard error of 1. We will call it Z: P(Z ≤ (a − m) / s)
+So, no matter the units, the probability of X ≤ a is the same as the probability of a standard normal variable being less than (a − m) / s. If `mu` is the average and `sigma` the standard error, which of the following R code would give us the right answer in every situation: b
+
+a. `mean(X<=a)`
+b. `pnorm((a - m)/s)`
+c. `pnorm((a - m)/s, m, s)`
+d. `pnorm(a)`
+
+7. Imagine the distribution of male adults is approximately normal with an expected value of 69 and a standard deviation of 3. How tall is the male in the 99th percentile? Hint: use qnorm.
+```{r}
+qnorm(0.99, 69, 3)
+```
+
+8. The distribution of IQ scores is approximately normally distributed. The average is 100 and the standard deviation is 15. Suppose you want to know the distribution of the highest IQ across all graduating classes if 10,000 people are born each in your school district. Run a Monte Carlo simulation with `B=1000` generating 10,000 IQ scores and keeping the highest. Make a histogram.
+```{r}
+B = 1000
+replicate(B, max(rnorm(10000, 100, 15))) %>%
+  as.data.frame() %>%
+  ggplot(aes(.)) +
+  geom_histogram(binwidth = 1, color = "black", fill = "grey", alpha = 0.5)
+```
+
+
+
+
