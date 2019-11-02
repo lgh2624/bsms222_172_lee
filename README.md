@@ -32,6 +32,9 @@
 ### 1014_12
 [robust_summaries_20191014_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1014_12/robust_summaries_20191014_172_lee.nb.html)
 
+### 1104-06_13
+[probability_20191104_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1104-06_13/probability_20191104_172_lee.nb.html)
+
 ## Tutorials
 
 ### Explore SCN2A mutations collected from Sanders et al 2018
