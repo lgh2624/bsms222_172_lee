@@ -100,7 +100,7 @@ P(S < 0) and P(S ≤ 0) are differnet for binominal distibutions since those dis
 
 ## 14.4 Distributions versus probability distributions
 
-For x that the list of numbers of x(sub)1(/sub), ..., x(sub)n(/sub) has distribution. We can define mean and standard deviation of x:
+For x that the list of numbers of x<sub>1</sub>, ..., x<sub>n</sub> has distribution. We can define mean and standard deviation of x:
 ```
 m <- sum(x)/length(x)
 s <- sqrt(sum((x - m)^2) / length(x))
@@ -161,7 +161,7 @@ identical(s, sd(x))
 s-sd(x)
 ```
 
-Because originally  `mean` and `sd` is expected value and standard error respectively. For X of X(sub)1(/sub), ..., X(sub)N(/sub)
+Because originally  `mean` and `sd` is expected value and standard error respectively. For X of X<sub>1</sub>, ..., X<sub>N</sub>
 $$ \bar{X} = \frac{1}{N}\sum_{i=1}^NX_i $$
 
 $$ s = \sqrt{\frac{1}{N-1}\sum_{i=1}^N(X_i-\bar{X})^2} $$
