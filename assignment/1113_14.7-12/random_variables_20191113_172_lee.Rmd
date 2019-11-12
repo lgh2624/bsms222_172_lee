@@ -1,0 +1,439 @@
+---
+title: "Random variable"
+output: html_notebook
+---
+# 14 Random variable - (2)
+##
+```{R}
+library(tidyverse)
+library(dslabs)
+```
+
+## 14.7 Central Limit Theorem
+
+The Central Limit Theorem (CLT) tells us that when the number of draws, also called the sample size, is large, the probability distribution of the sum of the independent draws is approximately normal.
+If a random variable has a probability distribution that is approximated with the normal distribution, then all we need to describe the probability distribution are the average and standard deviation, referred to as the expected value and standard error.
+
+We previously ran this Monte Carlo simulation:
+```{R}
+n <- 1000
+B <- 10000
+roulette_winnings <- function(n){
+  X <- sample(c(-1,1), n, replace = TRUE, prob=c(9/19, 10/19))
+  sum(X)
+}
+S <- replicate(B, roulette_winnings(n))
+```
+
+By CLT, the sum and standard deviation of the sample can be approximated by a normal distribution with the formular learnt before:
+```{r}
+n * (20-18)/38 
+sqrt(n) * 2 * sqrt(90)/19 
+```
+
+These values:
+```{r}
+mean(S)
+sd(S)
+```
+well match with real values.
+
+So, we can use approximation insted of Monte Carlo simulation
+```{r}
+mu <- n * (20-18)/38
+se <-  sqrt(n) * 2 * sqrt(90)/19 
+pnorm(0, mu, se)
+```
+
+This also matches with real value. 
+```{r}
+mean(S < 0)
+```
+
+### 14.7 How large is large in the Central Limit Theorem?
+
+The CLT works when the number of draws is large. But large is a relative term. When the probability of success is very small, we need much larger sample sizes.
+But the sum is certainly not well approximated by a normal distribution, generally when the probability of a success is very low, so the CLT does not apply, even with the very large sample size.
+We can use `dpois`, `ppois`, `rpois` to generate or handle Poisson distributions.
+
+## 14.8 Statistical properties of averages
+
+1. The expected value of the sum of random variables is the sum of each random variable’s expected value.
+$$ E[X_1+\cdots+X_n] = E[X_1] +\cdots +E[X_n] $$
+For Xs has same expected value $\mu$:
+$$ E[X_1+\cdots+X_n] = n\mu$$
+
+2. The expected value of a non-random constant times a random variable is the non-random constant times the expected value of a random variable.
+$$E[aX]= aE[X]$$
+
+So,
+$$E[\frac{X_1+\cdots+X_n}{n}]= \cdots = \mu$$
+
+3. The square of the standard error of the sum of independent random variables is the sum of the square of the standard error of each random variable.
+$$ SE[X_1 +\cdots+X_n] =  \sqrt{SE[X_1]^2+\cdots+SE[X_n]^2}$$
+The square of the standard error is referred to as the variance in statistical textbooks.
+
+4. The standard error of a non-random constant times a random variable is the non-random constant times the random variable’s standard error.
+$$SE[aX] = a\times SE[X]$$
+
+So, Xs has same standard error $\sigma$
+$$ SE[\frac{X_1 +\cdots+X_n}{n}] = \frac{\sigma}{\sqrt{n}}$$
+
+5. If X is a normally distributed random variable, then if a and b are non-random constants, aX + b is also a normally distributed random variable.
+
+## 14.9 Law of large numbers
+
+When n is very large, then the standard error is practically 0 and the average of the draws converges to the average of the urn. 
+
+### 14.9.1 Misinterpreting law of averages
+
+The law of averages is sometimes misinterpreted. For each events, the probabilit of drawing something is independent with events before. The law of averages applies only when the number of draws is very large and not in small samples.
+
+## 14.10 Exercises
+
+1. In American Roulette you can also bet on green. There are 18 reds, 18 blacks and 2 greens (0 and 00). What are the chances the green comes out?
+2/(18+18+2) = 0.0526
+
+2. The payout for winning on green is \$17 dollars. This means that if you bet a dollar and it lands on green, you get \$17. Create a sampling model using sample to simulate the random variable X for your winnings. Hint: see the example below for how it should look like when betting on red.
+```
+x <- sample(c(1,-1), 1, prob = c(9/19, 10/19))
+```
+```{r}
+x <- sample(c(17, -1), 1, prob = c(1/19, 18/19))
+```
+3. Compute the expected value of X.
+17*1/19 - 18/19 = -0.05
+```{R}
+17/19-18/19
+```
+
+4. Compute the standard error of X.
+$|17-(-1)|\sqrt{\frac{1}{19}\times\frac{18}{19}}$
+```{r}
+18 * sqrt(1/19*18/19)
+```
+
+5. Now create a random variable S that is the sum of your winnings after betting on green 1000 times. Hint: change the argument `size` and `replace` in your answer to question 2. Start your code by setting the seed to 1 with `set.seed(1)`.
+```{r}
+set.seed(1)
+n = 1000
+S <- sum(replicate(n, sample(c(17, -1), 1, prob = c(1/19, 18/19))))
+```
+
+6. What is the expected value of S?
+```{r}
+n*(-1/19)
+```
+
+7. What is the standard error of S?
+```{r}
+18 * sqrt(n*1/19*18/19)
+```
+
+8. What is the probability that you end up winning money? Hint: use the CLT.
+```{R}
+1 - pnorm(0, -52.63, 127.1028)
+```
+
+9. Create a Monte Carlo simulation that generates 1,000 outcomes of S. Compute the average and standard deviation of the resulting list to confirm the results of 6 and 7. Start your code by setting the seed to 1 with `set.seed(1)`.
+```{r}
+set.seed(1)
+
+game <- function(){
+n = 1000
+S <- replicate(n, sample(c(17, -1), 1, prob = c(1/19, 18/19)))
+sum(S)
+}
+
+
+B = 1000
+S <- replicate(B, game())
+```
+
+10. Now check your answer to 8 using the Monte Carlo result.
+```{r}
+mean(S)
+sd(S)
+mean(S > 0)
+```
+
+11. The Monte Carlo result and the CLT approximation are close, but not that close. What could account for this? b
+
+a. 1,000 simulations is not enough. If we do more, they match.
+b. The CLT does not work as well when the probability of success is small. In this case, it was 1/19. If we make the number of roulette plays bigger, they will match better.
+c. The difference is within rounding error.
+d. The CLT only works for averages.
+
+12. Now create a random variable Y that is your average winnings per bet after playing off your winnings after betting on green 1,000 times.
+```{r}
+n = 1000
+Y <- mean(replicate(n, sample(c(17, -1), 1, prob = c(1/19, 18/19))))
+```
+
+13. What is the expected value of Y?
+```{r}
+-1/19
+```
+
+14. What is the standard error of Y?
+```{r}
+18*sqrt(1/19*18/19/n)
+```
+
+15. What is the probability that you end up with winnings per game that are positive? Hint: use the CLT.
+```{r}
+1 - pnorm(0, -0.053, 0.127)
+```
+
+16. Create a Monte Carlo simulation that generates 2,500 outcomes of Y. Compute the average and standard deviation of the resulting list to confirm the results of 6 and 7. Start your code by setting the seed to 1 with `set.seed(1)`.
+```{r}
+set.seed(1)
+game_2 <- function(){
+  n = 1000
+  Y <- replicate(n, sample(c(17, -1), 1, prob = c(1/19, 18/19)))
+  mean(Y)
+}
+  
+B = 2500
+Y <- replicate(B, game_2())
+```
+
+17. Now check your answer to 8 using the Monte Carlo result.
+```{r}
+mean(Y)
+sd(Y)
+mean(Y>0)
+```
+
+18. The Monte Carlo result and the CLT approximation are now much closer. What could account for this? a
+
+a. We are now computing averages instead of sums.
+b. 2,500 Monte Carlo simulations is not better than 1,000.
+c. The CLT works better when the sample size is larger. We increased from 1,000 to 2,500.
+d. It is not closer. The difference is within rounding error.
+
+## 14.11 Case study: The Big Short
+
+### 14.11.1 Interest rates explained with chance model
+
+Suppose you run a small bank that has a history of identifying potential homeowners that can be trusted to make payments. You can also make a profit, but if you set the interest rates too high, your clients will go to another bank. We use all these facts and some probability theory to decide what interest rate you should charge.
+Suppose your bank will give out 1,000 loans for \$180,000 this year. Also, after adding up all costs, suppose your bank loses \$200,000 per foreclosure. For simplicity, we assume this includes all operational costs. A sampling model for this scenario can be coded like this:
+```{R}
+n <- 1000
+loss_per_foreclosure <- -200000
+p <- 0.02 
+defaults <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE)
+sum(defaults * loss_per_foreclosure)
+```
+
+The total loss defined by the final sum is a random variable. We can easily construct a Monte Carlo simulation to get an idea of the distribution of this random variable.
+```{R}
+B <- 10000
+losses <- replicate(B, {
+    defaults <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE) 
+  sum(defaults * loss_per_foreclosure)
+})
+```
+
+We don’t really need a Monte Carlo simulation though. The CLT tells us that because our losses are a sum of independent draws, its distribution is approximately normal with expected value and standard errors given by:
+```{R}
+n*(p*loss_per_foreclosure + (1-p)*0)
+sqrt(n)*abs(loss_per_foreclosure)*sqrt(p*(1-p))
+```
+
+We can now set an interest rate to guarantee that, on average, we break even. Basically, we need to add a quantity x to each loan, which in this case are represented by draws, so that the expected value is 0. If we define l to be the loss per foreclosure, we need: $lp+x(1-p)=0 $
+So, $x=l\times\frac{p}{1-p}$
+```{r}
+- loss_per_foreclosure*p/(1-p)
+```
+or an interest rate of 0.023.
+
+Although this interest rate guarantees that on average we break even, there is a 50% chance that we lose money. We therefore need to pick an interest rate that makes it unlikely for this to happen. At the same time, if the interest rate is too high. So let’s say that we want our chances of losing money to be 1 in 100, what does the x quantity need to be now?
+We want the sum S for P(S<0) = 0.01.
+For S, E[S] = {lp + x(1-p)}n with n draw times. The standard error for S is $SE[S] = |x-l|\sqrt{np(1-p)} = (x-l)\sqrt{np(1-p)}$
+And from $P(S<0) = 0.01$, $$P(\frac{S-E[S]}{SE[S]}<-\frac{E[S]}{SE[S]})$$
+The mean and standard deviation of left term is 1 and 0 respectedly we can consider it as standard normal distribution Z. Also we derived E[S] and SE[S] so,
+$$ P(Z<-\frac{[lp+x(1-p)]n}{(x-l)\sqrt{np(1-p)}}) = 0.01 $$
+And we can replace right term as z, $$-\frac{[lp+x(1-p)]n}{(x-l)\sqrt{np(1-p)}}= z $$
+When $P(Z<z) = 0.01 $,
+```{r}
+qnorm(0.01)
+```
+
+Now, we can compute x given p, l, n by
+$$ x= -l\frac{np-z\sqrt{np(1-p)}}{n(1-p)+z\sqrt{np(1-p)}}$$
+and by R code:
+```{R}
+l <- loss_per_foreclosure
+z <- qnorm(0.01)
+x <- -l*( n*p - z*sqrt(n*p*(1-p)))/ ( n*(1-p) + z*sqrt(n*p*(1-p)))
+x
+```
+Our interest rate now goes up to 0.035.
+
+By choosing this interest rate, we now have an expected profit per loan of:
+```{R}
+loss_per_foreclosure*p + x*(1-p)
+```
+
+which is a total expected profit of about:
+```{R}
+n*(loss_per_foreclosure*p + x*(1-p)) 
+```
+
+With using Monte Carlo simulation:
+```{r}
+B <- 100000
+profit <- replicate(B, {
+    draws <- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-p, p), replace = TRUE) 
+    sum(draws)
+})
+mean(profit)
+
+mean(profit<0)
+```
+
+### 14.11.2 The Big Short
+
+One of your employees points out that since the bank is making 2,124 dollars per loan, the bank should give out more loans! Why just n? You explain that finding those n clients was hard. You need a group that is predictable and that keeps the chances of defaults low. He then points out that even if the probability of default is higher, as long as our expected value is positive, you can minimize your chances of losses by increasing n and relying on the law of large numbers.
+
+He claims that even if the default rate is twice as high, say 4%, if we set the rate just a bit higher than this value:
+```{R}
+p <- 0.04
+r <- (- loss_per_foreclosure*p/(1-p)) / 180000
+r
+```
+
+At 5% of people are default,
+```{R}
+r <- 0.05
+x <- r*180000
+loss_per_foreclosure*p + x * (1-p)
+```
+
+Before, we get
+$$P(S<0) = P(Z<-\frac{E[S]}{SE[S]})$$
+
+and $E[S]=n\mu$, $SE[S] = \sqrt{n}\sigma$. When z = `qnorm(0.01),
+$$ -\frac{n\mu}{\sqrt{n}\sigma} = -\frac{\sqrt{n}\mu}{\sigma} = z$$
+
+Finally, $ n\ge\frac{z^2\sigma^2}{\mu^2}$ stands.
+If x is fixed:
+```{R}
+z <- qnorm(0.01)
+n <- ceiling((z^2*(x-l)^2*p*(1-p))/(l*p + x*(1-p))^2)
+n
+```
+
+The probability of losing is about 0.01 and we are expected to earn a total
+```{r}
+n*(loss_per_foreclosure*p + x * (1-p))
+```
+
+If we use Monte Carlo simulation:
+```{r}
+p <- 0.04
+x <- 0.05*180000
+profit <- replicate(B, {
+    draws <- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-p, p), replace = TRUE) 
+    sum(draws)
+})
+mean(profit)
+```
+
+But it is not realistic. Because not every defaulting events are independent. So, the standard error does not changes
+$$ SE[\frac{X_1+\cdots+X_1}{n}] = SE[\frac{nX_1}{n}] = \sigma$$
+
+So, we can make more realistic model with global effets:
+```{r}
+p <- 0.04
+x <- 0.05*180000
+profit <- replicate(B, {
+    new_p <- 0.04 + sample(seq(-0.01, 0.01, length = 100), 1)
+    draws <- sample( c(x, loss_per_foreclosure), n, 
+                        prob=c(1-new_p, new_p), replace = TRUE) 
+    sum(draws)
+})
+```
+
+The profit would be still large, the probability of negative earnings shoots up:
+```{r}
+mean(profit)
+
+mean(profit<0)
+```
+
+To visualize this:
+```{r}
+data.frame(profit_in_millions=profit/10^6) %>% 
+  ggplot(aes(profit_in_millions)) + 
+  geom_histogram(color="black", binwidth = 5)
+```
+The theory completely breaks down and the random variable has much more variability than expected. 
+
+## 14.12 Exercises
+
+1. Create a random variable S with the earnings of your bank if you give out 10,000 loans, the default rate is 0.3, and you lose $200,000 in each foreclosure. Hint: use the code we showed in the previous section, but change the parameters.
+```{R}
+n <- 10000
+loss_per_foreclosure <- -200000
+p <- 0.3
+S <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE)
+sum(S * loss_per_foreclosure)
+```
+
+2. Run a Monte Carlo simulation with 10,000 outcomes for B. Make a histogram of the results.
+```{R}
+loan <- function(){
+  n <- 10000
+  loss_per_foreclosure <- -200000
+  p <- 0.3
+  S <- sample( c(0,1), n, prob=c(1-p, p), replace = TRUE)
+  sum(S * loss_per_foreclosure)
+}
+
+B = 10000
+
+S <- replicate(B, loan())
+
+data.frame(profit_in_millions=S/10^6) %>% 
+  ggplot(aes(profit_in_millions)) + 
+  geom_histogram(color="black", binwidth = 2.5)
+```
+
+3. What is the expected value of S?
+```{r}
+mean(S)
+```
+
+4. What is the standard error of S?
+```{r}
+sd(S)
+```
+
+5. Suppose we give out loans for $180,000. What should the interest rate be so that our expected value is 0?
+```{r}
+loss_per_foreclosure = -180000
+x = -loss_per_foreclosure*p/(1-p)
+x/-loss_per_foreclosure
+```
+
+
+6. (Harder) What should the interest rate be so that the chance of losing money is 1 in 20? In math notation, what should the interest rate be so that P(S < 0) = 0.05?
+P((S-E)/SE = Z < -E/SE)
+Therefore, -E/SE = qnorm(0.05)
+```{r}
+l <- loss_per_foreclosure
+z <- qnorm(0.05)
+x <- -l*( n*p - z*sqrt(n*p*(1-p)))/ ( n*(1-p) + z*sqrt(n*p*(1-p)))
+-x/l
+```
+
+7. If the bank wants to minimize the probabilities of losing money, which of the following does not make interest rates go up? b
+
+a. A smaller pool of loans.
+b. A larger probability of default.
+c. A smaller required probability of losing money.
+d. The number of Monte Carlo simulations.
