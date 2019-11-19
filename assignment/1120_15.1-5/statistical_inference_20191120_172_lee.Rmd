@@ -64,8 +64,8 @@ Before we continue, let’s make an important clarification related to the pract
 ### 15.2.4 Properties of our estimate: expected value and standard error
 
 To understand how good our estimate is, we will describe the statistical properties of the random variable defined above: the sample proportion $\bar{X}$.
-Using what we have learned, the expected value of the sum $ N\bar{X} = Np$ So, $E(\bar{X}) = p$
-We can also use what we learned to figure out the standard error: the standard error of the sum is $\sqrt{N}\sigma$, and for this example, the standard deviation of p is $(1-0)\sqrt{p{1-p)} = \sqrt{p(1-p)}$ Therefore, the standard error of p for N times is $ SE(\bar{X}) = \sqrt{\frac{p(1-p)}{N}} $.
+Using what we have learned, the expected value of the sum $N\bar{X} = Np$ So, $E(\bar{X}) = p$
+We can also use what we learned to figure out the standard error: the standard error of the sum is $\sqrt{N}\sigma$, and for this example, the standard deviation of p is $(1-0)\sqrt{p(1-p)}=\sqrt{p(1-p)}$ Therefore, the standard error of p for N times is $ SE(\bar{X}) = \sqrt{\frac{p(1-p)}{N}} $.
 The expected value of $\bar{X}$ is the parameter of interest p and we can make the standard error as small as we want by increasing N. The law of large numbers tells us that with a large enough poll, our estimate converges to p.
 If we take a large enough poll to make our standard error about 1%, we will be quite certain about who will win. But how large does the poll have to be for the standard error to be this small?
 One problem is that we do not know p, so we can’t compute the standard error. However, for illustrative purposes, let’s assume that p=0.51 and make a plot of the standard error versus the sample size N:

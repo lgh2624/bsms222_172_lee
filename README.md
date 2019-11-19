@@ -41,6 +41,9 @@
 ### 1113_14.7-12
 [random_variables_20191111_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1113_14.7-12/random_variables_20191113_172_lee.nb.html)
 
+### 1120_15.1-5
+[statistical_inference_20191120_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1120_15.1-5/statistical_inference_20191120_172_lee.nb.html)
+
 ## Tutorials
 
 ### Explore SCN2A mutations collected from Sanders et al 2018
