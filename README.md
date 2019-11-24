@@ -44,6 +44,10 @@
 ### 1120_15.1-5
 [statistical_inference_20191120_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1120_15.1-5/statistical_inference_20191120_172_lee.nb.html)
 
+### 1120_15.6-10
+[statistical_inference_20191125_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1125_15.6-10/statistical_inference_20191125_172_lee.nb.html)
+
+
 ## Tutorials
 
 ### Explore SCN2A mutations collected from Sanders et al 2018
