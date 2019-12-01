@@ -47,8 +47,11 @@
 ### 1120_15.6-10
 [statistical_inference_20191125_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1125_15.6-10/statistical_inference_20191125_172_lee.nb.html)
 
-### 1120_15.6-10
+### 1125_16.1-3
 [statistical_models_20191127_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1127_16.1-3/statistical_models_20191125_172_lee.nb.html)
+
+### 1202_16.4-10
+[statistical_models_20191202_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/1202_16.4-10/statistical_models_20191202_172_lee.nb.html)
 
 ## Tutorials
 
