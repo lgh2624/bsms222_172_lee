@@ -61,15 +61,6 @@
 ### Gene annotations for the human genome
 [analyze_gencode.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/lecture_material/02_analyze_gencode/analyze_gencode_01.nb.html)
 
-### TCGA Lung Cancer
-[analyze_tcga.Rmd]
-
-### Gene expression in developing human brains
-[]
-
-### Analysis of genetic variants from general population
-[]
-
 ## Assignments
 
 ### Assignment 1
