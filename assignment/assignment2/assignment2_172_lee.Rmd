@@ -233,6 +233,7 @@ p
 마지막으로 y축을 약어로 변경하고 y축의 organ 순서와 범례 순서를 일치시켜서 직관성을 높였다. 
 
 ```{r, fig.height = 9}
+abbs <- c('BM&I', 'B&C', 'Ear', 'E&M', 'Eye', 'Face', 'GIT', 'H/L/CV', 'KRT', 'MC', 'SK', 'Skin', 'SC/PN', 'T&D')
 d1 %>%
   group_by(organ, type) %>%
   ggplot(aes(x = pLI, y = organ, fill = organ)) +
@@ -261,8 +262,9 @@ d1 %>%
   geom_vline(xintercept = 0.1) +
   geom_vline(xintercept = 0.9) +
   scale_y_discrete(limits = rev(levels(organ_axis)),
-                   labels = rev(c('BM&I', 'B&C', 'Ear', 'E&M', 'Eye', 'Face', 'GIT', 'H/L/CV', 'KRT', 'MC', 'SK', 'Skin', 'SC/PN', 'T&D'))) +
-  scale_fill_manual(name = 'organ', values = organ_axis, labels = paste(c('BM&I', 'B&C', 'Ear', 'E&M', 'Eye', 'Face', 'GIT', 'H/L/CV', 'KRT', 'MC', 'SK', 'Skin', 'SC/PN', 'T&D'), organ_axis, sep = ': ')) +
+                   labels = rev(abbs)) +
+  scale_fill_discrete(limits = levels(organ_axis), 
+                      labels = paste(abbs, organ_axis, sep = ': ')) +
   coord_fixed(ratio = 0.25)
 ```
 
