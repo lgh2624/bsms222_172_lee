@@ -1,0 +1,110 @@
+---
+title: "Final Test"
+output: html_notebook
+---
+## Q1
+From the dataset `heights` in the `dslabs` package, please describe the
+distribution of male and female heights. If you pick a female at random, what is
+the probability that she is 61 inches or shorter? 
+
+```{r}
+library(dslabs)
+library(tidyverse)
+data(heights)
+
+head(heights)
+heights %>% group_by(sex) %>% summarize(mean = mean(height), sd = sd(height), n= n())
+```
+
+```{r}
+heights %>% ggplot(aes(x=height, fill = sex)) +
+  geom_histogram(binwidth = 1, col = 'black') +
+  facet_wrap(sex ~.)
+```
+두 집단의 분포는 위와 같이 나타낼 수 있다.
+
+평균은 남성이 여성보다 5 inch 정도 더 높고, 표준편차는 두 집단사이에 큰 차이가 없었다.
+두 집단 모두 평균 근처에서 가장 높고, 좌우 극단으로 갈 수록 사람수가 감소하는 분포를 가지고 있었다. 따라서 자연에서 자주 관찰되는 정규분포로 가정해볼 수 있다.
+
+```{r}
+heights %>% filter(sex == "Female") %>% summarize(a=mean(height <= 61)) %>% pull(a)
+pnorm(61, 64.94, 3.76)
+```
+실제 61인치 이하 여성은 12.1%이고, 정규분포로 근사한 61인치 이하 여성의 비율은 14.7%로 2%p의 차이를 보임을 알 수 있다.
+
+## Q2
+
+For American Roulette, there are 19 reds, 16 blacks and 3 greens. The payout
+for winning on green is 15 dollars. You create a random variable that is the sum of
+your winnings after betting on green 1000 times. Start your code by setting the
+seed to 1. Describe your random variable (e.g. the expected value, the standard
+error). Then, create a Monte Carlo simulation that generates 1,000 outcomes of a
+random variable, and then describe your result. 
+
+```{r}
+p = 35/38
+N = 1000
+# set.seed(1)
+X <- replicate(N, sample(c(-1, 15), 1, prob=c(p, 1-p)))
+sum(X)
+sd(X)
+
+ev = (-1*p+15*(1-p))*N
+se = (15-(-1))*sqrt(N*p*(1-p))
+ev
+se
+```
+
+```{r}
+set.seed(1)
+
+p = 35/38
+N = 1000
+B = 1000
+X <- replicate(B, {
+  X <- replicate(N, sample(c(-1, 15), 1, prob=c(p, 1-p)))
+  return(sum(X))
+})
+mean(X)
+sd(X)
+
+data.frame(winning = X) %>%
+  ggplot(aes(x=winning)) +
+  geom_histogram(binwidth = 50, col = 'black')
+```
+winning을 1000번 나타냈을 때, 가운데가 가장 높고 양 끝으로 갈 수록 적어지는 분포를 보인다. 하지만 이는 정규분포는 아니다. 좌우가 대칭이 되지 않고 다소 낮은 값에 쏠림을 알 수 있다. 이는 두 결과값이 차이가 크기 때문에 (-1과 15) 정규분포에 대한 근사가 완벽하게 되지 않고, 오차가 발생할 수 있다. 하지만 실제 기댓값, 표준 오차가 이론값과 비슷하므로 CLT이 들어맞는다고 할 수 있지만, 다른 모델을 구상하는 것이 좋을 것이다.
+
+## Q3
+
+
+```{r}
+set.seed(1)
+polling = function(N, B, type){
+  X <- replicate(B, {
+    p = 0.45
+    X <- replicate(N, sample(c(0,1), 1, prob = c((1-p), p)))
+    EV = mean(X)
+    SE = sd(X)
+    return(c(EV, SE))
+  })
+  X <- t(X) %>% data.frame()
+  colnames(X) = c('EV', 'SE')
+  X %>% mutate(N = N, B = B, type = type)
+  }
+
+p1 = polling(10, 100, 'a')
+p2 = polling(1000, 100, 'b')
+p3 = polling(10, 10000, 'c')
+p4 = polling(1000, 10000, 'd')
+
+p_total <- rbind(p1,p2,p3,p4)
+
+
+ggplot(p_total) +
+  geom_point(aes(x=EV, y= 1), alpha = 0.2) +
+  facet_grid(B ~ N, labeller = label_both) +
+  geom_vline(xintercept = 0.45)
+```
+
+주어진 조건대로 가상의 설문조사를 진행한 결과를 나타내면 위와 같다.
+N 즉, 한 설문조사에서 몇 명을 조사했는지를 나타내는 데, N이 커질 수록 실젯값 p=0.45에 가까이 분포하는 것을 알 수 있다. 또한 B 즉, 설문조사 횟수를 늘릴 수록 더 극단적인 값이 나타나는 경우의 수가 늘어나서 분포가 더 멀어진다. 따라서 N과 B는 늘어날 수록 더 정확한 값을 얻는데 도움이 되지만, B값을 늘리는 경우에는 극단적인 값이 늘어나므로 주의할 필요가 있을 것이다.
