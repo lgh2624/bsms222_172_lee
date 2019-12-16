@@ -66,6 +66,9 @@
 ### Assignment 1
 [assignment1_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/assignment01/assignment1_172_lee.nb.html)
 
+### Assignment 2
+[assignment2_172_lee.Rmd](https://htmlpreview.github.io/?https://github.com/lgh2624/bsms222_172_lee/blob/master/assignment/assignment2/assignment2_172_lee.nb.html)
+
 ## Quizes
 
 ### Quiz 0923
